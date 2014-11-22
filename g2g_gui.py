@@ -49,6 +49,57 @@ cut_mode = 0
 def floats(s):
   return list(map(float,str.split(s,',')))
 
+def test_forces():
+
+  original_stdout = sys.stdout  # keep a reference to STDOUT
+
+  if Output_name.get():
+    sys.stdout = open(Output_name.get(), 'w')
+
+  if not offset_str.get():
+    default_offset_str()
+  if not matrix_str.get():
+    default_matrix_str()
+  if not speed_str.get():
+    default_speed_str()
+
+
+  offset = floats(offset_str.get())
+  matrix = floats(matrix_str.get())
+  speed = floats(speed_str.get())
+
+  #
+  # main program
+  #
+
+  import graphtec
+  import pic
+  import optimize
+
+#  offset = (5, 1)
+#  matrix = (1, 0, 0, 1)
+
+  g = graphtec.graphtec()
+
+  g.start()
+
+  g.set(offset=offset, matrix=matrix)
+  g.set(speed=speed)
+
+  for i in range(0, 6):
+    for j in range(0, 5):
+      g.set(force=1 + j + 5 * i)
+      tx = 0.5 * j
+      ty = 0.5 * i
+      g.closed_path([(tx, ty), (tx + 0.3, ty), (tx + 0.3, ty + 0.3), (tx, ty + 0.3)])
+
+  g.end()
+
+  if Output_name.get():
+    sys.stdout = original_stdout  # restore STDOUT back to its original value
+    tkinter.messagebox.showinfo("G2G_GUI Message", "File '%s' created" % (Output_name.get()))
+
+
 def main_program():
   #
   # convert file to pic format
@@ -116,7 +167,7 @@ def main_program():
     default_force_str()
   if not cut_mode_str.get():
     default_cut_mode_str()
-    
+
   offset = floats(offset_str.get())
   border = floats(border_str.get())
   matrix = floats(matrix_str.get())
@@ -194,7 +245,7 @@ def Send_to_Cutter():
     if not Output_name.get():
       return
     src=os.path.normpath(Output_name.get())
-    
+
     if not cutter_shared_name_str.get():
       tkinter.messagebox.showerror("G2G_GUI ERROR", "The name of the cutter (as a shared printer) was not provided.")
       return
@@ -202,7 +253,7 @@ def Send_to_Cutter():
     #if not os.path.exists(cutter_shared_name_str.get()):
     #  tkinter.messagebox.showerror("G2G_GUI ERROR", "The name of the cutter (as a shared printer) does not exist.")
     #  return
-    
+
     dst=os.path.normpath(cutter_shared_name_str.get())
     if os.name=='nt':
       os.system("copy /B \"%s\" \"%s\"" % (src, dst))
@@ -236,10 +287,10 @@ def get_ghostscript_path():
 
 def default_offset_str():
     offset_str.set("4.0,0.5")
-    
+
 def default_border_str():
     border_str.set("1,1")
-    
+
 def default_matrix_str():
     matrix_str.set("1,0,0,1")
 
@@ -248,7 +299,7 @@ def default_speed_str():
 
 def default_force_str():
     force_str.set("8,30")
-    
+
 def default_cut_mode_str():
     cut_mode_str.set("0")
 
@@ -303,10 +354,12 @@ else:
   Label(top, text="Cutter Device Name").grid(row=12, column=0, sticky=W)
 Entry(top, bd =1, width=60, textvariable=cutter_shared_name_str).grid(row=12, column=1, sticky=E)
 
-tkinter.Button(top, width=40, text = "Create Graphtec File", command = main_program).grid(row=13, column=1)
+tkinter.Button(top, width=40, text = "Create Graphtec File from input", command = main_program).grid(row=13, column=1)
 tkinter.Button(top, width=40, text = "Send Graphtec File to Silhouette Cutter", command = Send_to_Cutter).grid(row=14, column=1)
 tkinter.Button(top, width=40, text = "Save Configuration", command = Save_Configuration).grid(row=15, column=1)
 tkinter.Button(top, width=40, text = "Exit", command = Just_Exit).grid(row=16, column=1)
+tkinter.Button(top, width=40, text = "Create force testing Graphtec file", command=test_forces).grid(row=17, column=1)
+
 
 if path.isfile(CONFPATH) and access(CONFPATH, R_OK):
     f = open(CONFPATH,'r')
