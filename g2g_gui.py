@@ -3,6 +3,7 @@ import tkinter
 import sys
 import os
 import string
+import subprocess
 
 from tkinter import *
 from tkinter import filedialog
@@ -99,6 +100,27 @@ def test_forces():
     sys.stdout = original_stdout  # restore STDOUT back to its original value
     tkinter.messagebox.showinfo("G2G_GUI Message", "File '%s' created" % (Output_name.get()))
 
+
+def show_gerber():
+
+  if not os.path.exists(Gerber_name.get()):
+    get_input_filename()
+  if not os.path.exists(Gerber_name.get()):
+    tkinter.messagebox.showerror("G2G_GUI ERROR", "The path provided for the input Gerber file is invalid.")
+    return
+
+  head, tail = os.path.split(Gerber_name.get())
+
+  if os.name == 'nt':
+    if not os.path.exists(gerbv_path.get()):
+      tkinter.messagebox.showerror("G2G_GUI ERROR", "The path provided for gerbv is invalid.")
+      return
+
+    if not os.path.exists(pstoedit_path.get()):
+      tkinter.messagebox.showerror("G2G_GUI ERROR", "The path provided for pstoedit is invalid.")
+      return
+
+  subprocess.Popen([os.path.normpath(gerbv_path.get()), os.path.normpath(Gerber_name.get())])
 
 def main_program():
   #
@@ -354,11 +376,12 @@ else:
   Label(top, text="Cutter Device Name").grid(row=12, column=0, sticky=W)
 Entry(top, bd =1, width=60, textvariable=cutter_shared_name_str).grid(row=12, column=1, sticky=E)
 
-tkinter.Button(top, width=40, text = "Create Graphtec File from input", command = main_program).grid(row=13, column=1)
-tkinter.Button(top, width=40, text = "Send Graphtec File to Silhouette Cutter", command = Send_to_Cutter).grid(row=14, column=1)
-tkinter.Button(top, width=40, text = "Save Configuration", command = Save_Configuration).grid(row=15, column=1)
-tkinter.Button(top, width=40, text = "Exit", command = Just_Exit).grid(row=16, column=1)
-tkinter.Button(top, width=40, text = "Create force testing Graphtec file", command=test_forces).grid(row=17, column=1)
+tkinter.Button(top, width=40, text = "Show Gerber", command=show_gerber).grid(row=13, column=1)
+tkinter.Button(top, width=40, text = "Create Graphtec File from input", command = main_program).grid(row=14, column=1)
+tkinter.Button(top, width=40, text = "Send Graphtec File to Silhouette Cutter", command = Send_to_Cutter).grid(row=15, column=1)
+tkinter.Button(top, width=40, text = "Save Configuration", command = Save_Configuration).grid(row=16, column=1)
+tkinter.Button(top, width=40, text = "Exit", command = Just_Exit).grid(row=17, column=1)
+tkinter.Button(top, width=40, text = "Create force testing Graphtec file", command=test_forces).grid(row=18, column=1)
 
 
 if path.isfile(CONFPATH) and access(CONFPATH, R_OK):
