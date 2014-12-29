@@ -267,18 +267,36 @@ def Send_to_Cutter():
       tkinter.messagebox.showerror("G2G_GUI ERROR", "The name of the cutter (as a shared printer) was not provided.")
       return
 
+    if not os.path.isfile(src):
+      tkinter.messagebox.showerror("G2G_GUI ERROR", "The plotter does not appear to be connected to the path provided.")
+      return
+
     #if not os.path.exists(cutter_shared_name_str.get()):
     #  tkinter.messagebox.showerror("G2G_GUI ERROR", "The name of the cutter (as a shared printer) does not exist.")
     #  return
 
     dst=os.path.normpath(cutter_shared_name_str.get())
-    if os.name=='nt':
-      os.system("copy /B \"%s\" \"%s\"" % (src, dst))
-    else:
-      os.system("cat %s > %s" % (src, dst))
+    if not os.path.isfile(dst):
+      tkinter.messagebox.showerror("G2G_GUI ERROR", "The Graphtec output file has not been generated, please press the 'Create Graphtec File' button first.")
+      return
+
+    try:
+      with open(src, 'r') as f, open(dst, 'w') as lpt:
+        while True:
+          buf = f.read()
+          if not buf: break
+          lpt.write(buf)
+    except:
+      tkinter.messagebox.showerror("G2G_GUI ERROR", "There was an error sending the Graphtec file to the plotter")
+      return
+
+#    if os.name=='nt':
+#      os.system("copy /B \"%s\" \"%s\"" % (src, dst))
+#    else:
+#      os.system("cat %s > %s" % (src, dst))
 
 def get_input_filename():
-    input_filename=tkinter.filedialog.askopenfilename(title='Select paste mask Gerber file', filetypes=[('Gerber File', '*.g*'),("All files", "*.*")] )
+    input_filename=tkinter.filedialog.askopenfilename(title='Select paste mask Gerber file', filetypes=[('Gerber File', ('*.g*', '*.G*')),("All files", "*.*")])
     if input_filename:
         Gerber_name.set(input_filename)
 
