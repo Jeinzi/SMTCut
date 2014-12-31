@@ -268,7 +268,7 @@ def Send_to_Cutter():
       return
 
     if not os.path.isfile(src):
-      tkinter.messagebox.showerror("G2G_GUI ERROR", "The plotter does not appear to be connected to the path provided.")
+      tkinter.messagebox.showerror("G2G_GUI ERROR", "The Graphtec output file has not been generated, please press the 'Create Graphtec File' button first.")
       return
 
     #if not os.path.exists(cutter_shared_name_str.get()):
@@ -276,10 +276,6 @@ def Send_to_Cutter():
     #  return
 
     dst=os.path.normpath(cutter_shared_name_str.get())
-    if not os.path.isfile(dst):
-      tkinter.messagebox.showerror("G2G_GUI ERROR", "The Graphtec output file has not been generated, please press the 'Create Graphtec File' button first.")
-      return
-
     try:
       with open(src, 'r') as f, open(dst, 'w') as lpt:
         while True:
