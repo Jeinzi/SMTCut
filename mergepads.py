@@ -4,7 +4,7 @@ import numpy as np
 from scipy.spatial import ConvexHull
 
 DEBUG = False
-DEBUG_SVG = False
+DEBUG_SVG = True
 
 def log(s):
     if DEBUG:
