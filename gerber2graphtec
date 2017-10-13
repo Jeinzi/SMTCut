@@ -16,6 +16,11 @@ import argparse
 import graphtec
 import pic
 import optimize
+import mergepads
+
+merge_threshold = [0.012, 0.01]
+
+
 
 
 def main():
@@ -33,12 +38,14 @@ def main():
         help='use speed s in device units; s2,s3 for multiple passes (default: 2 passes, speed 2 in each pass)')
     parser.add_argument('--force', type=floats, default=[8,30],
         help='use force f in device units; f2,f3 for multiple passes (default: first pass 8, second pass 30)')
-    parser.add_argument('--cut_mode', choices=(0,1), default=0,
+    parser.add_argument('--cut_mode', choices=[0,1], default=0,
         help='0 for highest accuracy (fine pitch), 1 for highest speed (default: 0)')
     parser.add_argument('--media_size', type=floats, default=[12,11],
         help='size of media (default: 12x11 inches)')
     parser.add_argument('--rotate', type=float, dest='theta', default=0.,
         help='rotate counterclockwise by theta degrees (default: no rotation)')
+    parser.add_argument('--merge', choices=[0,1], default=0,
+        help='merge close smaller structures into one big cutout (default: 0)')
     parser.add_argument('input_filename')
     args = parser.parse_args()
 
@@ -66,6 +73,11 @@ def main():
     g.start()
 
     strokes = pic.read_pic(temp_pic)
+
+    if not args.merge == 0:
+      # Merge multiple smaller pads to bigger pads spanning the same area.
+      strokes = mergepads.fix_small_geometry(strokes, merge_threshold[0], merge_threshold[1])
+
     strokes = optimize.rotate(strokes, args.theta)
     strokes = optimize.justify(strokes)
     max_x,max_y = optimize.max_extent(strokes)
