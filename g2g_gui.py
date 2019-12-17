@@ -1,15 +1,13 @@
 #!/usr/bin/env python
-import Tkinter
-import tkMessageBox
-import tkFileDialog
+import tkinter
 import sys
 import os
 import string
 
-from Tkinter import *
+from tkinter import *
 from os import path, access, R_OK, W_OK
 
-top = Tkinter.Tk()
+top = tkinter.Tk()
 top.title("Gerber to Graphtec")
 
 Gerber_name = StringVar()
@@ -234,44 +232,44 @@ def default_cut_mode_str():
 
 Label(top, text="Gerber File ").grid(row=1, column=0, sticky=W)
 Entry(top, bd =1, width=60, textvariable=Gerber_name).grid(row=1, column=1)
-Tkinter.Button(top, width=9, text = "Browse", command = get_input_filename).grid(row=1, column=2)
+tkinter.Button(top, width=9, text = "Browse", command = get_input_filename).grid(row=1, column=2)
 
 Label(top, text="Output File ").grid(row=2, column=0, sticky=W)
 Entry(top, bd =1, width=60, textvariable=Output_name).grid(row=2, column=1)
-Tkinter.Button(top, width=9, text = "Browse", command = get_output_filename).grid(row=2, column=2)
+tkinter.Button(top, width=9, text = "Browse", command = get_output_filename).grid(row=2, column=2)
 
 if os.name=='nt':
   Label(top, text="gerbv path ").grid(row=3, column=0, sticky=W)
   Entry(top, bd =1, width=60, textvariable=gerbv_path).grid(row=3, column=1)
-  Tkinter.Button(top, width=9, text = "Browse", command = get_gerbv_path).grid(row=3, column=2)
+  tkinter.Button(top, width=9, text = "Browse", command = get_gerbv_path).grid(row=3, column=2)
 
   Label(top, text="pstoedit path ").grid(row=4, column=0, sticky=W)
   Entry(top, bd =1, width=60, textvariable=pstoedit_path).grid(row=4, column=1)
-  Tkinter.Button(top, width=9, text = "Browse", command = get_pstoedit_path).grid(row=4, column=2)
+  tkinter.Button(top, width=9, text = "Browse", command = get_pstoedit_path).grid(row=4, column=2)
 
 Label(top, text="Offset ").grid(row=5, column=0, sticky=W)
 Entry(top, bd =1, width=60, textvariable=offset_str).grid(row=5, column=1)
-Tkinter.Button(top, width=9, text = "Default", command = default_offset_str).grid(row=5, column=2)
+tkinter.Button(top, width=9, text = "Default", command = default_offset_str).grid(row=5, column=2)
 
 Label(top, text="Border ").grid(row=6, column=0, sticky=W)
 Entry(top, bd =1, width=60, textvariable=border_str).grid(row=6, column=1)
-Tkinter.Button(top, width=9, text = "Default", command = default_border_str).grid(row=6, column=2)
+tkinter.Button(top, width=9, text = "Default", command = default_border_str).grid(row=6, column=2)
 
 Label(top, text="Matrix ").grid(row=7, column=0, sticky=W)
 Entry(top, bd =1, width=60, textvariable=matrix_str).grid(row=7, column=1)
-Tkinter.Button(top, width=9, text = "Default", command = default_matrix_str).grid(row=7, column=2)
+tkinter.Button(top, width=9, text = "Default", command = default_matrix_str).grid(row=7, column=2)
 
 Label(top, text="Speed ").grid(row=8, column=0, sticky=W)
 Entry(top, bd =1, width=60, textvariable=speed_str).grid(row=8, column=1)
-Tkinter.Button(top, width=9, text = "Default", command = default_speed_str).grid(row=8, column=2)
+tkinter.Button(top, width=9, text = "Default", command = default_speed_str).grid(row=8, column=2)
 
 Label(top, text="Force ").grid(row=9, column=0, sticky=W)
 Entry(top, bd =1, width=60, textvariable=force_str).grid(row=9, column=1)
-Tkinter.Button(top, width=9, text = "Default", command = default_force_str).grid(row=9, column=2)
+tkinter.Button(top, width=9, text = "Default", command = default_force_str).grid(row=9, column=2)
 
 Label(top, text="Cut Mode ").grid(row=10, column=0, sticky=W)
 Entry(top, bd =1, width=60, textvariable=cut_mode_str).grid(row=10, column=1)
-Tkinter.Button(top, width=9, text = "Default", command = default_cut_mode_str).grid(row=10, column=2)
+tkinter.Button(top, width=9, text = "Default", command = default_cut_mode_str).grid(row=10, column=2)
 
 if os.name=='nt':
   Label(top, text="Cutter Shared Name").grid(row=11, column=0, sticky=W)
@@ -279,10 +277,10 @@ else:
   Label(top, text="Cutter Device Name").grid(row=11, column=0, sticky=W)
 Entry(top, bd =1, width=60, textvariable=cutter_shared_name_str).grid(row=11, column=1, sticky=E)
 
-Tkinter.Button(top, width=40, text = "Create Graphtec File", command = main_program).grid(row=12, column=1)
-Tkinter.Button(top, width=40, text = "Send Graphtec File to Silhouette Cutter", command = Send_to_Cutter).grid(row=13, column=1)
-Tkinter.Button(top, width=40, text = "Save Configuration", command = Save_Configuration).grid(row=14, column=1)
-Tkinter.Button(top, width=40, text = "Exit", command = Just_Exit).grid(row=15, column=1)
+tkinter.Button(top, width=40, text = "Create Graphtec File", command = main_program).grid(row=12, column=1)
+tkinter.Button(top, width=40, text = "Send Graphtec File to Silhouette Cutter", command = Send_to_Cutter).grid(row=13, column=1)
+tkinter.Button(top, width=40, text = "Save Configuration", command = Save_Configuration).grid(row=14, column=1)
+tkinter.Button(top, width=40, text = "Exit", command = Just_Exit).grid(row=15, column=1)
 
 if path.isfile(CONFPATH) and access(CONFPATH, R_OK):
     f = open(CONFPATH,'r')

@@ -37,7 +37,7 @@ if len(sys.argv)==2:
 elif len(sys.argv)==1:
   f = sys.stdin
 else:
-  print 'usage: file2graphtec [filename]'
+  print('usage: file2graphtec [filename]')
   sys.exit(1)
 
 endpoint = 1
