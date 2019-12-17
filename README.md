@@ -3,6 +3,7 @@
   <h3 align="center">cut SMT stencils from Gerber files</h3>
 </p>
 <br><br>
+
 [![GPL](https://img.shields.io/badge/license-GPL-blue)](https://github.com/pmonta/gerber2graphtec/blob/master/LICENSE)
 [![Python](https://img.shields.io/badge/language-Python3-orange)](https://www.python.org)
 [![GitHub Release](https://img.shields.io/badge/release-v0.2-brightgreen)](https://github.com/pmonta/gerber2graphtec/releases)
