@@ -5,9 +5,12 @@ import os
 import string
 import subprocess
 
+import graphtec
+import pic
+import optimize
+
 from tkinter import *
-from tkinter import filedialog
-from tkinter import messagebox
+from tkinter import filedialog, messagebox
 from os import path, access, R_OK, W_OK
 
 top = tkinter.Tk()
@@ -47,11 +50,16 @@ speed = [2,2]
 force = [8,30]
 cut_mode = 0
 
+
+
+
 def floats(s):
   return list(map(float,str.split(s,',')))
 
-def test_forces():
 
+
+
+def test_forces():
   original_stdout = sys.stdout  # keep a reference to STDOUT
 
   if Output_name.get():
@@ -69,21 +77,8 @@ def test_forces():
   matrix = floats(matrix_str.get())
   speed = floats(speed_str.get())
 
-  #
-  # main program
-  #
-
-  import graphtec
-  import pic
-  import optimize
-
-#  offset = (5, 1)
-#  matrix = (1, 0, 0, 1)
-
   g = graphtec.graphtec()
-
   g.start()
-
   g.set(offset=offset, matrix=matrix)
   g.set(speed=speed)
 
@@ -101,8 +96,9 @@ def test_forces():
     tkinter.messagebox.showinfo("G2G_GUI Message", "File '%s' created" % (Output_name.get()))
 
 
-def show_gerber():
 
+
+def show_gerber():
   if not os.path.exists(Gerber_name.get()):
     get_input_filename()
   if not os.path.exists(Gerber_name.get()):
@@ -116,11 +112,10 @@ def show_gerber():
       tkinter.messagebox.showerror("G2G_GUI ERROR", "The path provided for gerbv is invalid.")
       return
 
-    if not os.path.exists(pstoedit_path.get()):
-      tkinter.messagebox.showerror("G2G_GUI ERROR", "The path provided for pstoedit is invalid.")
-      return
-
   subprocess.Popen([os.path.normpath(gerbv_path.get()), os.path.normpath(Gerber_name.get())])
+
+
+
 
 def main_program():
   #
