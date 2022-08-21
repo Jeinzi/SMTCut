@@ -13,11 +13,13 @@ import os
 import string
 import argparse
 
-def main():
-    #
-    # parse arguments
-    #
+import graphtec
+import pic
+import optimize
 
+
+def main():
+    # Parse arguments.
     floats = lambda s: map(float,string.split(s,','))
 
     parser = argparse.ArgumentParser()
@@ -38,12 +40,10 @@ def main():
     parser.add_argument('--rotate', type=float, dest='theta', default=0.,
         help='rotate counterclockwise by theta degrees (default: no rotation)')
     parser.add_argument('input_filename')
-
     args = parser.parse_args()
 
-    #
-    # convert file to pic format
-    #
+
+    # Convert file to PIC format.
     temp_pdf = "_tmp_gerber.pdf"
     temp_ps  = "_tmp_gerber.ps"
     temp_pic = "_tmp_gerber.pic"
@@ -57,21 +57,12 @@ def main():
     os.system(f"pstoedit -f pic '{temp_ps}' '{temp_pic}' 2>/dev/null")
 
 
-    #
-    # main program
-    #
-
-    import graphtec
-    import pic
-    import optimize
-
+    # Convert to Graphtec.
     g = graphtec.graphtec()
-
     g.set(media_size=args.media_size)
     offset, border = args.offset, args.border
     g.set(offset=(offset[0]+border[0]+0.5,offset[1]+border[1]+0.5))
     g.set(matrix=args.matrix)
-
     g.start()
 
     strokes = pic.read_pic(temp_pic)
@@ -101,6 +92,9 @@ def main():
           g.closed_path(border_path)
 
     g.end()
+
+
+
 
 if __name__ == "__main__":
     main()
