@@ -32,7 +32,7 @@ def main():
     parser.add_argument('--speed', type=floats, default=[2,2],
         help='use speed s in device units; s2,s3 for multiple passes (default: 2 passes, speed 2 in each pass)')
     parser.add_argument('--force', type=floats, default=[8,30],
-        help='use force f in device units; f2,f3 for multiple passes')
+        help='use force f in device units; f2,f3 for multiple passes (default: first pass 8, second pass 30)')
     parser.add_argument('--cut_mode', choices=(0,1), default=0,
         help='0 for highest accuracy (fine pitch), 1 for highest speed (default: 0)')
     parser.add_argument('--media_size', type=floats, default=[12,11],
