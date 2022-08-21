@@ -90,13 +90,18 @@ if not input_filename:
 #
 
 temp_pdf = "_tmp_gerber.pdf"
+temp_ps  = "_tmp_gerber.ps"
 temp_pic = "_tmp_gerber.pic"
 
-if str.lower(input_filename[-3:])=='pdf':
-  os.system("pstoedit -f pic %s %s 2>/dev/null" % (input_filename,temp_pic))
-else:
-  os.system("gerbv --export=pdf --output=%s --border=20 %s" % (temp_pdf,input_filename))
-  os.system("pstoedit -f pic %s %s 2>/dev/null" % (temp_pdf,temp_pic))
+
+pdf_filename = input_filename
+if str.lower(input_filename[-3:]) != "pdf":
+  os.system(f"gerbv --export=pdf --output='{temp_pdf}' --border=20 '{input_filename}'")
+  pdf_filename = temp_pdf
+
+os.system(f"gs -dNOPAUSE -dBATCH -sDEVICE=ps2write -sOutputFile='{temp_ps}' '{pdf_filename}'")
+os.system(f"pstoedit -f pic '{temp_ps}' '{temp_pic}' 2>/dev/null")
+
 
 #
 # main program

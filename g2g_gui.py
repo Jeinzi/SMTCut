@@ -15,6 +15,7 @@ top.title("Gerber to Graphtec")
 Gerber_name = StringVar()
 Output_name = StringVar()
 gerbv_path = StringVar()
+ghostscript_path  = StringVar()
 pstoedit_path  = StringVar()
 offset_str  = StringVar()
 border_str  = StringVar()
@@ -28,6 +29,7 @@ CONFPATH='./g2g_gui.cnf'
 input_filename = ''
 output_filename = ''
 gerbv_filename = ''
+ghostscript_filename = ''
 pstoedit_filename = ''
 offset_text = ''
 border_text = ''
@@ -62,10 +64,12 @@ def main_program():
 
   if os.name=='nt':
     temp_pdf = os.path.normpath("%s\_tmp_gerber.pdf" % (head))
+    temp_ps  = os.path.normpath("%s\_tmp_gerber.ps"  % (head))
     temp_pic = os.path.normpath("%s\_tmp_gerber.pic" % (head))
     temp_bat = os.path.normpath("%s\_tmp_gerber.bat" % (head))
   else:
     temp_pdf = "_tmp_gerber.pdf"
+    temp_ps  = "_tmp_gerber.ps"
     temp_pic = "_tmp_gerber.pic"
 
   if os.name=='nt':
@@ -76,14 +80,24 @@ def main_program():
     if not os.path.exists(pstoedit_path.get()):
       tkinter.messagebox.showerror("G2G_GUI ERROR", "The path provided for pstoedit is invalid.")
       return
+
+    if not os.path.exists(ghostscript_path.get()):
+      tkinter.messagebox.showerror("G2G_GUI ERROR", "The path provided for Ghostscript is invalid.")
+      return
   
+  gerbv = os.path.normpath(gerbv_path.get())
+  ghostscript = os.path.normpath(ghostscript_path.get())
+  pstoedit = os.path.normpath(pstoedit_path.get())
+  gerberNormpath = os.path.normpath(Gerber_name.get())
   if os.name=='nt':
-    os.system("echo \"%s\" --export=pdf --output=%s --border=0 \"%s\" > \"%s\"" % (os.path.normpath(gerbv_path.get()),temp_pdf,os.path.normpath(Gerber_name.get()),temp_bat))
-    os.system("echo \"%s\" -q -f pic \"%s\" \"%s\" >> \"%s\"" % (os.path.normpath(pstoedit_path.get()),temp_pdf,temp_pic, temp_bat))
-    os.system("\"%s\"" % temp_bat)
+    os.system(f'echo "{gerbv}" --export=pdf --output="{temp_pdf}" --border=0 "{gerberNormpath}" > "{temp_bat}"')
+    os.system(f'echo "{ghostscript}" -dNOPAUSE -dBATCH -sDEVICE=ps2write -sOutputFile="{temp_ps}" "{temp_pdf}" >> "{temp_bat}"')
+    os.system(f'echo "{pstoedit}" -q -f pic "{temp_ps}" "{temp_pic}" >> "{temp_bat}"')
+    os.system(temp_bat)
   else:
-    os.system("%s --export=pdf --output=%s --border=0 \"%s\"" % (os.path.normpath(gerbv_path.get()),temp_pdf,os.path.normpath(Gerber_name.get())))
-    os.system("%s -q -f pic \"%s\" \"%s\"" % (os.path.normpath(pstoedit_path.get()),temp_pdf,temp_pic))
+    os.system(f"'{gerbv}' --export=pdf --output='{temp_pdf}' --border=0 '{gerberNormpath}'")
+    os.system(f"'{ghostscript}' -dNOPAUSE -dBATCH -sDEVICE=ps2write -sOutputFile='{temp_ps}' '{temp_pdf}'")
+    os.system(f"'{pstoedit}' -q -f pic '{temp_ps}' '{temp_pic}'")
 
   original_stdout = sys.stdout  # keep a reference to STDOUT
 
@@ -160,6 +174,7 @@ def Save_Configuration():
     f.write(Gerber_name.get() + '\n')
     f.write(Output_name.get() + '\n')
     f.write(gerbv_path.get() + '\n')
+    f.write(ghostscript_path.get() + '\n')
     f.write(pstoedit_path.get() + '\n')
     f.write(offset_str.get() + '\n')
     f.write(border_str.get() + '\n')
@@ -214,6 +229,11 @@ def get_pstoedit_path():
     if pstoedit_filename:
         pstoedit_path.set(pstoedit_filename)
 
+def get_ghostscript_path():
+    ghostscript_filename=tkinter.filedialog.askopenfilename(title='Select Ghostscript program', initialfile='ghostscript.exe', filetypes=[('Programs', '*.exe')] )
+    if ghostscript_filename:
+        ghostscript_path.set(ghostscript_filename)
+
 def default_offset_str():
     offset_str.set("4.0,0.5")
     
@@ -245,44 +265,48 @@ if os.name=='nt':
   Entry(top, bd =1, width=60, textvariable=gerbv_path).grid(row=3, column=1)
   tkinter.Button(top, width=9, text = "Browse", command = get_gerbv_path).grid(row=3, column=2)
 
-  Label(top, text="pstoedit path ").grid(row=4, column=0, sticky=W)
-  Entry(top, bd =1, width=60, textvariable=pstoedit_path).grid(row=4, column=1)
-  tkinter.Button(top, width=9, text = "Browse", command = get_pstoedit_path).grid(row=4, column=2)
+  Label(top, text="Ghostscript path ").grid(row=4, column=0, sticky=W)
+  Entry(top, bd =1, width=60, textvariable=ghostscript_path).grid(row=4, column=1)
+  tkinter.Button(top, width=9, text = "Browse", command = get_ghostscript_path).grid(row=4, column=2)
 
-Label(top, text="Offset ").grid(row=5, column=0, sticky=W)
-Entry(top, bd =1, width=60, textvariable=offset_str).grid(row=5, column=1)
-tkinter.Button(top, width=9, text = "Default", command = default_offset_str).grid(row=5, column=2)
+  Label(top, text="pstoedit path ").grid(row=5, column=0, sticky=W)
+  Entry(top, bd =1, width=60, textvariable=pstoedit_path).grid(row=5, column=1)
+  tkinter.Button(top, width=9, text = "Browse", command = get_pstoedit_path).grid(row=5, column=2)
 
-Label(top, text="Border ").grid(row=6, column=0, sticky=W)
-Entry(top, bd =1, width=60, textvariable=border_str).grid(row=6, column=1)
-tkinter.Button(top, width=9, text = "Default", command = default_border_str).grid(row=6, column=2)
+Label(top, text="Offset ").grid(row=6, column=0, sticky=W)
+Entry(top, bd =1, width=60, textvariable=offset_str).grid(row=6, column=1)
+tkinter.Button(top, width=9, text = "Default", command = default_offset_str).grid(row=6, column=2)
 
-Label(top, text="Matrix ").grid(row=7, column=0, sticky=W)
-Entry(top, bd =1, width=60, textvariable=matrix_str).grid(row=7, column=1)
-tkinter.Button(top, width=9, text = "Default", command = default_matrix_str).grid(row=7, column=2)
+Label(top, text="Border ").grid(row=7, column=0, sticky=W)
+Entry(top, bd =1, width=60, textvariable=border_str).grid(row=7, column=1)
+tkinter.Button(top, width=9, text = "Default", command = default_border_str).grid(row=7, column=2)
 
-Label(top, text="Speed ").grid(row=8, column=0, sticky=W)
-Entry(top, bd =1, width=60, textvariable=speed_str).grid(row=8, column=1)
-tkinter.Button(top, width=9, text = "Default", command = default_speed_str).grid(row=8, column=2)
+Label(top, text="Matrix ").grid(row=8, column=0, sticky=W)
+Entry(top, bd =1, width=60, textvariable=matrix_str).grid(row=8, column=1)
+tkinter.Button(top, width=9, text = "Default", command = default_matrix_str).grid(row=8, column=2)
 
-Label(top, text="Force ").grid(row=9, column=0, sticky=W)
-Entry(top, bd =1, width=60, textvariable=force_str).grid(row=9, column=1)
-tkinter.Button(top, width=9, text = "Default", command = default_force_str).grid(row=9, column=2)
+Label(top, text="Speed ").grid(row=9, column=0, sticky=W)
+Entry(top, bd =1, width=60, textvariable=speed_str).grid(row=9, column=1)
+tkinter.Button(top, width=9, text = "Default", command = default_speed_str).grid(row=9, column=2)
 
-Label(top, text="Cut Mode ").grid(row=10, column=0, sticky=W)
-Entry(top, bd =1, width=60, textvariable=cut_mode_str).grid(row=10, column=1)
-tkinter.Button(top, width=9, text = "Default", command = default_cut_mode_str).grid(row=10, column=2)
+Label(top, text="Force ").grid(row=10, column=0, sticky=W)
+Entry(top, bd =1, width=60, textvariable=force_str).grid(row=10, column=1)
+tkinter.Button(top, width=9, text = "Default", command = default_force_str).grid(row=10, column=2)
+
+Label(top, text="Cut Mode ").grid(row=11, column=0, sticky=W)
+Entry(top, bd =1, width=60, textvariable=cut_mode_str).grid(row=11, column=1)
+tkinter.Button(top, width=9, text = "Default", command = default_cut_mode_str).grid(row=11, column=2)
 
 if os.name=='nt':
-  Label(top, text="Cutter Shared Name").grid(row=11, column=0, sticky=W)
+  Label(top, text="Cutter Shared Name").grid(row=12, column=0, sticky=W)
 else:
-  Label(top, text="Cutter Device Name").grid(row=11, column=0, sticky=W)
-Entry(top, bd =1, width=60, textvariable=cutter_shared_name_str).grid(row=11, column=1, sticky=E)
+  Label(top, text="Cutter Device Name").grid(row=12, column=0, sticky=W)
+Entry(top, bd =1, width=60, textvariable=cutter_shared_name_str).grid(row=12, column=1, sticky=E)
 
-tkinter.Button(top, width=40, text = "Create Graphtec File", command = main_program).grid(row=12, column=1)
-tkinter.Button(top, width=40, text = "Send Graphtec File to Silhouette Cutter", command = Send_to_Cutter).grid(row=13, column=1)
-tkinter.Button(top, width=40, text = "Save Configuration", command = Save_Configuration).grid(row=14, column=1)
-tkinter.Button(top, width=40, text = "Exit", command = Just_Exit).grid(row=15, column=1)
+tkinter.Button(top, width=40, text = "Create Graphtec File", command = main_program).grid(row=13, column=1)
+tkinter.Button(top, width=40, text = "Send Graphtec File to Silhouette Cutter", command = Send_to_Cutter).grid(row=14, column=1)
+tkinter.Button(top, width=40, text = "Save Configuration", command = Save_Configuration).grid(row=15, column=1)
+tkinter.Button(top, width=40, text = "Exit", command = Just_Exit).grid(row=16, column=1)
 
 if path.isfile(CONFPATH) and access(CONFPATH, R_OK):
     f = open(CONFPATH,'r')
@@ -292,6 +316,8 @@ if path.isfile(CONFPATH) and access(CONFPATH, R_OK):
     output_filename = output_filename.strip()
     gerbv_filename = f.readline()
     gerbv_filename = gerbv_filename.strip()
+    ghostscript_filename = f.readline()
+    ghostscript_filename = ghostscript_filename.strip()
     pstoedit_filename = f.readline()
     pstoedit_filename = pstoedit_filename.strip()
     offset_text =  f.readline()
@@ -319,6 +345,11 @@ if not gerbv_filename:
         gerbv_filename="C:/Program Files (x86)/gerbv-2.6.0/bin/gerbv.exe"
     else:
         gerbv_filename="gerbv"
+if not ghostscript_filename:
+    if os.name=='nt':
+        ghostscript_filename="C:/Program Files/gs/gs9.56.1/bin/gswin64.exe"
+    else:
+        ghostscript_filename="gs"
 if not pstoedit_filename:
     if os.name=='nt':
         pstoedit_filename="C:/Program Files/pstoedit/pstoedit.exe"
@@ -345,6 +376,7 @@ if not cutter_shared_name_text:
 Gerber_name.set(input_filename)
 Output_name.set(output_filename)
 gerbv_path.set(gerbv_filename)
+ghostscript_path.set(ghostscript_filename)
 pstoedit_path.set(pstoedit_filename)
 offset_str.set(offset_text)
 border_str.set(border_text)

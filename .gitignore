@@ -1,2 +1,5 @@
 *~
 *.pyc
+_tmp_*
+result.txt
+g2g_gui.cnf
