@@ -50,8 +50,14 @@ def main():
     args = parser.parse_args()
 
 
+    temp_pdf = "_tmp_gerber.pdf"
+    temp_ps  = "_tmp_gerber.ps"
+    temp_pic = "_tmp_gerber.pic"
+    pdf_filename = args.input_filename
+    extension = pdf_filename[-3:].lower()
+
     # Check dependencies.
-    allowed_inkscape_files = ('svg', 'dxf')
+    allowed_inkscape_extensions = ('svg', 'dxf')
     
     if distutils.spawn.find_executable("pstoedit") is None:
         print("FATAL ERROR: Could not find 'pstoedit' in your PATH. Exiting.")
@@ -59,21 +65,14 @@ def main():
     if distutils.spawn.find_executable("gerbv") is None:
         print("ERROR: Could not find 'gerbv' in your PATH. Exiting")
         sys.exit(1)
-    if distutils.spawn.find_executable("inkscape") is None and input_filename[-3:].lower() in allowed_inkscape_files:
+    if distutils.spawn.find_executable("inkscape") is None and extension in allowed_inkscape_extensions:
         print("ERROR: Could not find 'inkscape' in your PATH. Exiting")
         sys.exit(1)
 
 
-    temp_pdf = "_tmp_gerber.pdf"
-    temp_ps  = "_tmp_gerber.ps"
-    temp_pic = "_tmp_gerber.pic"
-
-    pdf_filename = args.input_filename
-    extension = pdf_filename[-3:].lower()
-
     # If file is not a PDF, try to convert it to one.
     if extension != "pdf":
-      if extension in allowed_inkscape_files:
+      if extension in allowed_inkscape_extensions:
         os.system(f"inkscape --export-filename={temp_pdf} {pdf_filename}")
       else:
         os.system(f"gerbv --export=pdf --output='{temp_pdf}' --border=0 '{args.input_filename}'")
