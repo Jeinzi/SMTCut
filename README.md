@@ -9,8 +9,7 @@
 [![GitHub Release](https://img.shields.io/badge/release-v0.2-brightgreen)](https://github.com/pmonta/gerber2graphtec/releases)
 
 ## About
-
-SMTCut, previously called **gerber2graphtec**, is a tool for cutting accurate SMT stencils on a **Graphtec** or **Silhouette** vinyl cutter from Gerber files.<br>
+SMTCut, previously called **gerber2graphtec**, is a tool for cutting accurate SMT stencils on a **Graphtec** or **Silhouette** vinyl cutter from Gerber, SVG, DXF or PDF files.<br>
 
 Techniques include separately drawn line segments (no complex paths), antibacklash, drag-knife-angle "training", and multiple passes.<br>
 
@@ -18,11 +17,10 @@ This produces stencils usable down to approximately **0.5 mm pitch** (QFP/QFN) a
 
 
 ## Getting Started
-
 To be able to run this software, make sure that you have installed the following dependencies:
 
-- [gerbv](http://gerbv.geda-project.org)
-- [pstoedit](http://www.calvina.de/pstoedit/)
+- [gerbv](https://gerbv.github.io)
+- [pstoedit](http://www.calvina.de/pstoedit)
 - [libusb](https://libusb.info)
 
 #### Install on Mac OSX:
@@ -30,11 +28,8 @@ Make sure you already have installed [Homebrew](https://brew.sh/) and simply run
 
 ```
 brew install gerbv
-```
-```
 brew install pstoedit
-```
-```
+brew install ghostscript
 brew install libusb
 ```
 Also make sure that you've installed the libusb1 python package or install it via
@@ -96,11 +91,10 @@ To achieve the best results, one should run different calibrations, which can be
 
 ```
 python3 tests/test_forces.py > tmpfile
-python3 file2graphtec python3 file2graphtec tmpfile  
+python3 file2graphtec python3 file2graphtec tmpfile
 ```
 
 ## GUI
-
 An optional GUI has been provided by [jesuscf](https://github.com/jesuscfv). It allows interactive selection of the input Gerber file, parameters, and cutting operations.
 
 To use it, run the following command:
@@ -121,15 +115,13 @@ sudo usermod -a --group lp your_userid
 ```
 
 ## Additional Information
-
 These pages have hints on usage (e.g. on Windows), materials, performance, calibration, etc:
 
-- [pmonta.com](http://pmonta.com/blog/2012/12/25/smt-stencil-cutting/)
+- [pmonta.com](http://pmonta.com/smt-stencil-cutting.html)
 - [dangerousprototypes.com](http://dangerousprototypes.com/forum/viewtopic.php?f=68&t=5341)
 - [hackaday.com](http://hackaday.com/2012/12/27/diy-smd-stencils-made-with-a-craft-cutter/)
 
 ## Credits
-
 Thanks to the authors of robocut and graphtecprint for protocol documentation:
 
 - [robocut](http://gitorious.org/robocut)
@@ -138,7 +130,7 @@ Thanks to the authors of robocut and graphtecprint for protocol documentation:
 
 Also thanks to this web page (Cathy Sexton) for inspiration:
 
-- [idleloop.com](http://www.idleloop.com/robotics/cutter/index.php)
+- [idleloop.com](https://www.idleloop.com/robotics/cutter/index.php)
 
 Her cutter seems to be quite a bit better than mine was out of the box.
 With Silhouette's default software my 0.5 mm pitch pads were distorted to the point of unusability.
