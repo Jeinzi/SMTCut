@@ -21,6 +21,7 @@ device_list = [
   (0x0b4d, 0x112f),     # Silhouette Cameo 3
   (0x0b4d, 0x1123),     # Silhouette Portrait
   (0x0b4d, 0x1132),     # Silhouette Portrait 2
+  (0x0b4d, 0x113A),     # Silhouette Portrait 3 (not tested)
   (0x0b4d, 0x112c),     # Silhouette SD1 (not tested)
   (0x0b4d, 0x112d),     # Silhouette SD2 (not tested)
 ]
