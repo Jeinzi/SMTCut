@@ -16,21 +16,22 @@ import usb1
 #
 
 device_list = [
-  (0x0b4d, 0x1121),     # Silhouette Cameo
-  (0x0b4d, 0x112b),     # Silhouette Cameo 2
-  (0x0b4d, 0x112f),     # Silhouette Cameo 3
-  (0x0b4d, 0x1123),     # Silhouette Portrait
-  (0x0b4d, 0x1132),     # Silhouette Portrait 2
-  (0x0b4d, 0x113A),     # Silhouette Portrait 3 (not tested)
-  (0x0b4d, 0x112c),     # Silhouette SD1 (not tested)
-  (0x0b4d, 0x112d),     # Silhouette SD2 (not tested)
+  (0x0b4d, 0x1121, "Silhouette Cameo"),
+  (0x0b4d, 0x112b, "Silhouette Cameo 2"),
+  (0x0b4d, 0x112f, "Silhouette Cameo 3"),
+  (0x0b4d, 0x1123, "Silhouette Portrait"),
+  (0x0b4d, 0x1132, "Silhouette Portrait 2"),
+  (0x0b4d, 0x113A, "Silhouette Portrait 3"),  # Not tested
+  (0x0b4d, 0x112c, "Silhouette SD1"),         # Not tested
+  (0x0b4d, 0x112d, "Silhouette SD2"),         # Not tested
 ]
 
+# Open the first recognized device.
 def open_graphtec_device(ctx):
-  for (vendor_id,product_id) in device_list:
-    dev = ctx.openByVendorIDAndProductID(vendor_id, product_id)
-    if dev:
-      return dev
+  for (vendor_id,product_id,product_name) in device_list:
+    handle = ctx.openByVendorIDAndProductID(vendor_id, product_id)
+    if handle:
+      return (handle, product_name)
   return None
 
 #
@@ -38,28 +39,31 @@ def open_graphtec_device(ctx):
 #
 
 if len(sys.argv)==2:
-  f = open(sys.argv[1], 'rb')
+  f = open(sys.argv[1], "rb")
 elif len(sys.argv)==1:
   f = sys.stdin
 else:
-  print('usage: file2graphtec [filename]')
+  print("Usage: file2graphtec [filename]")
   sys.exit(1)
 
 endpoint = 1
 ctx = usb1.USBContext()
 
-dev = open_graphtec_device(ctx)
+res = open_graphtec_device(ctx)
 
-if not dev:
-  sys.stderr.write('no graphtec device found\n')
+if not res:
+  sys.stderr.write("No graphtec device found.\n")
   sys.exit(1)
+else:
+  (handle, product_name) = res
 
-dev.claimInterface(0)
+handle.claimInterface(0)
+print(f"Found device '{product_name}'.")
 
 while True:
   data = f.read(8)
   if not data:
     break
-  dev.bulkWrite(endpoint, data)
+  handle.bulkWrite(endpoint, data)
 
 f.close()
