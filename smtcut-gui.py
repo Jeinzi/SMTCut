@@ -63,7 +63,7 @@ def test_forces():
 
   if cnf["outputPath"]:
     sys.stdout = original_stdout  # restore STDOUT back to its original value
-    tkinter.messagebox.showinfo("G2G_GUI Message", f"File '{cnf['outputPath']}' created")
+    tkinter.messagebox.showinfo("SMTCut Message", f"File '{cnf['outputPath']}' created")
 
 
 
@@ -73,14 +73,14 @@ def show_gerber():
   if not os.path.exists(cnf["inputPath"]):
     get_input_filename()
   if not os.path.exists(cnf["inputPath"]):
-    tkinter.messagebox.showerror("G2G_GUI ERROR", "The path provided for the input Gerber file is invalid.")
+    tkinter.messagebox.showerror("SMTCut Error", "The path provided for the input Gerber file is invalid.")
     return
 
   head, tail = os.path.split(cnf["inputPath"])
 
   if os.name == 'nt':
     if not os.path.exists(cnf["gerbvPath"]):
-      tkinter.messagebox.showerror("G2G_GUI ERROR", "The path provided for gerbv is invalid.")
+      tkinter.messagebox.showerror("SMTCut Error", "The path provided for gerbv is invalid.")
       return
 
   subprocess.Popen([os.path.normpath(cnf["gerbvPath"]), os.path.normpath(cnf["inputPath"])])
@@ -95,7 +95,7 @@ def main_program():
   if not os.path.exists(cnf["inputPath"]):
     get_input_filename()
   if not os.path.exists(cnf["inputPath"]):
-    tkinter.messagebox.showerror("G2G_GUI ERROR", "The path provided for the input Gerber file is invalid.")
+    tkinter.messagebox.showerror("SMTCut Error", "The path provided for the input Gerber file is invalid.")
     return
 
   head, tail = os.path.split(cnf["inputPath"])
@@ -117,13 +117,13 @@ def main_program():
 
   if os.name=='nt':
     if not os.path.exists(gerbv):
-      tkinter.messagebox.showerror("G2G_GUI ERROR", "The path provided for gerbv is invalid.")
+      tkinter.messagebox.showerror("SMTCut Error", "The path provided for gerbv is invalid.")
       return
     if not os.path.exists(ghostscript):
-      tkinter.messagebox.showerror("G2G_GUI ERROR", "The path provided for Ghostscript is invalid.")
+      tkinter.messagebox.showerror("SMTCut Error", "The path provided for Ghostscript is invalid.")
       return
     if not os.path.exists(pstoedit):
-      tkinter.messagebox.showerror("G2G_GUI ERROR", "The path provided for pstoedit is invalid.")
+      tkinter.messagebox.showerror("SMTCut Error", "The path provided for pstoedit is invalid.")
       return
 
   
@@ -177,7 +177,7 @@ def main_program():
 
   if Output_name.get():
     sys.stdout = original_stdout  # restore STDOUT back to its original value
-    tkinter.messagebox.showinfo("G2G_GUI Message", f"File '{Output_name.get()}' created")
+    tkinter.messagebox.showinfo("SMTCut Message", f"File '{Output_name.get()}' created")
 
 
 def Just_Exit():
@@ -193,11 +193,11 @@ def Send_to_Cutter():
     src=os.path.normpath(cnf["outputPath"])
 
     if cnf["deviceName"] == "":
-      tkinter.messagebox.showerror("G2G_GUI ERROR", "The name of the cutter (as a shared printer) was not provided.")
+      tkinter.messagebox.showerror("SMTCut Error", "The name of the cutter (as a shared printer) was not provided.")
       return
 
     if not os.path.isfile(src):
-      tkinter.messagebox.showerror("G2G_GUI ERROR", "The Graphtec output file has not been generated, please press the 'Create Graphtec File' button first.")
+      tkinter.messagebox.showerror("SMTCut Error", "The Graphtec output file has not been generated, please press the 'Create Graphtec File' button first.")
       return
 
     dst = os.path.normpath(cnf["deviceName"])
@@ -208,7 +208,7 @@ def Send_to_Cutter():
           if not buf: break
           lpt.write(buf)
     except:
-      tkinter.messagebox.showerror("G2G_GUI ERROR", "There was an error sending the Graphtec file to the plotter")
+      tkinter.messagebox.showerror("SMTCut Error", "There was an error sending the Graphtec file to the plotter")
       return
 
 
@@ -259,7 +259,7 @@ def getDefaultValue(key, textfieldStr):
 
 if __name__ == "__main__":
     top = tkinter.Tk()
-    top.title("Gerber to Graphtec")
+    top.title("SMTCut")
     cnf = config.getConfig()
 
     # Create variables that bind to text fields and fill them with

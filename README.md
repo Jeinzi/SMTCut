@@ -4,9 +4,9 @@
 </p>
 <br><br>
 
-[![GPL](https://img.shields.io/badge/license-GPL-blue)](https://github.com/pmonta/gerber2graphtec/blob/master/LICENSE)
+[![GPL](https://img.shields.io/badge/license-GPL-blue)](https://github.com/Jeinzi/SMTCut/blob/master/LICENSE)
 [![Python](https://img.shields.io/badge/language-Python3-orange)](https://www.python.org)
-[![GitHub Release](https://img.shields.io/badge/release-v0.2-brightgreen)](https://github.com/pmonta/gerber2graphtec/releases)
+[![GitHub Release](https://img.shields.io/badge/release-v0.2-brightgreen)](https://github.com/Jeinzi/SMTCut/releases)
 
 ## About
 SMTCut, previously called **gerber2graphtec**, is a tool for cutting accurate SMT stencils on a **Graphtec** or **Silhouette** vinyl cutter from Gerber, SVG, DXF or PDF files.<br>
@@ -45,13 +45,13 @@ In general there are two different cases to distinguish depending on your operat
 E.g. a solderpaste gerber file (paste.gbr), and default settings:
 
 ```
-gerber2graphtec paste.gbr >/dev/usb/lp0
+./smtcut.py paste.gbr >/dev/usb/lp0
 ```
 
 Or a more elaborate command line with linear map (to correct spatial miscalibration) and multiple passes with different speeds and forces:
 
 ```
-gerber2graphtec --offset 3,4 --matrix 1.001,0,-0.0005,0.9985 --speed 2,1 --force 5,25 paste.gbr >/dev/usb/lp0
+./smtcut.py --offset 3,4 --matrix 1.001,0,-0.0005,0.9985 --speed 2,1 --force 5,25 paste.gbr >/dev/usb/lp0
 ```
 
 ### Mac OSX and Windows
@@ -60,38 +60,24 @@ With Mac OS X or Windows, the file2graphtec script can take the place of /dev/us
 E.g. a solderpaste gerber file (paste.gbr), and default settings:
 
 ```
-python3 gerber2graphtec paste.gbr > tmpfile
-python3 file2graphtec tmpfile
+python3 smtcut.py paste.gbr > tmpfile
+python3 file2graphtec.py tmpfile
 ```
 
 Or a more elaborate command line with linear map (to correct spatial miscalibration) and multiple passes with different speeds and forces:
 
 ```
-python3 gerber2graphtec --offset 3,4 --matrix 1.001,0,-0.0005,0.9985 --speed 2,1 --force 5,25 paste.gbr > tmpfile
-python3 file2graphtec tmpfile
+python3 smtcut.py --offset 3,4 --matrix 1.001,0,-0.0005,0.9985 --speed 2,1 --force 5,25 paste.gbr > tmpfile
+python3 file2graphtec.py tmpfile
 ```
 
-## Known issues
-Due to a bug inside ghostscript, you may need to downgrade to version < 9.26 or you might encounter repeating output --> [Issue17](https://github.com/pmonta/gerber2graphtec/issues/17)
-
-On Mac OSX this can be done by uninstalling ghostscript with:
-
-```
-brew uninstall --ignore-dependencies ghostscript
-```
-
-and reinstalling the version 9.25
-
-```
-brew install https://raw.githubusercontent.com/Homebrew/homebrew-core/b0b6b9495113b0ac5325e07d5427dc89170f690f/Formula/ghostscript.rb
-```
 
 ## Calibration
 To achieve the best results, one should run different calibrations, which can be found in the test folder after the blade is set. The following example shows how to calibrate the cutter on Mac OSX but the commands are also applicable to other operating systems (make sure you run these files from the main folder).
 
 ```
 python3 tests/test_forces.py > tmpfile
-python3 file2graphtec python3 file2graphtec tmpfile
+python3 file2graphtec.py tmpfile
 ```
 
 ## GUI
@@ -100,13 +86,13 @@ An optional GUI has been provided by [jesuscf](https://github.com/jesuscfv). It 
 To use it, run the following command:
 
 ```
-python3 g2g_gui.py
+python3 smtcut-gui.py
 ```
 
 ## Tips & Tricks
 You may want to have your CAM tool shrink the paste features by about 2 mils before exporting to gerber.  The craft-cutter knife, when cutting thin mylar, seems to spread out the geometry by about this amount.  I'd suggest using mylar with thickness between about 3 and 5 mils; the IPC-recommended thicknesses for fine-pitch stencils are approximately in this range.  (Typical inexpensive laser-transparency sheets happen to be just right, being somewhere between 3.5 and 4.3 mils.)  You may have to experiment with the cutting speeds and forces for best quality with your materials.
 
-Fedora 17 has gerbv-2.6.0 in its supplied package list, so no issue there.  For Fedora-like systems, "yum install gerbv pstoedit tkinter".
+For Fedora-like systems, "yum install gerbv pstoedit tkinter".
 
 On some Linux distributions, permissions on /dev/usb/lp0 are restricted by default.  To fix this, add yourself to the lp group and then log out and log back in:
 
