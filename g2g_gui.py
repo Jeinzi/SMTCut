@@ -8,6 +8,7 @@ import subprocess
 import graphtec
 import pic
 import optimize
+import config
 
 from tkinter import *
 from tkinter import filedialog, messagebox
@@ -28,59 +29,31 @@ speed_str  = StringVar()
 force_str  = StringVar()
 cut_mode_str  = StringVar()
 cutter_shared_name_str  = StringVar()
-CONFPATH='./g2g_gui.cnf'
-
-input_filename = ''
-output_filename = ''
-gerbv_filename = ''
-ghostscript_filename = ''
-pstoedit_filename = ''
-offset_text = ''
-border_text = ''
-matrix_text = ''
-speed_text = ''
-force_text = ''
-cut_mode_text = ''
-cutter_shared_name_text = ''
-
-offset = (4,0.5)
-border = (1,1)
-matrix = (1,0,0,1)
-speed = [2,2]
-force = [8,30]
-cut_mode = 0
 
 
+cnf = config.getConfig()
 
 
 def floats(s):
   return list(map(float,str.split(s,',')))
 
 
+def saveConfig():
+  updateConfigDict()
+  config.writeConfigFile(cnf)
 
 
 def test_forces():
+  updateConfigDict()
   original_stdout = sys.stdout  # keep a reference to STDOUT
 
-  if Output_name.get():
-    sys.stdout = open(Output_name.get(), 'w')
+  if cnf["outputPath"] != "":
+    sys.stdout = open(cnf["outputPath"], 'w')
 
-  if not offset_str.get():
-    default_offset_str()
-  if not matrix_str.get():
-    default_matrix_str()
-  if not speed_str.get():
-    default_speed_str()
-
-
-  offset = floats(offset_str.get())
-  matrix = floats(matrix_str.get())
-  speed = floats(speed_str.get())
 
   g = graphtec.graphtec()
   g.start()
-  g.set(offset=offset, matrix=matrix)
-  g.set(speed=speed)
+  g.set(offset=cnf["offset"], matrix=cnf["matrix"], speed=cnf["speed"])
 
   for i in range(0, 6):
     for j in range(0, 5):
@@ -91,28 +64,29 @@ def test_forces():
 
   g.end()
 
-  if Output_name.get():
+  if cnf["outputPath"]:
     sys.stdout = original_stdout  # restore STDOUT back to its original value
-    tkinter.messagebox.showinfo("G2G_GUI Message", "File '%s' created" % (Output_name.get()))
+    tkinter.messagebox.showinfo("G2G_GUI Message", "File '%s' created" % (cnf["outputPath"]))
 
 
 
 
 def show_gerber():
-  if not os.path.exists(Gerber_name.get()):
+  updateConfigDict()
+  if not os.path.exists(cnf["inputPath"]):
     get_input_filename()
-  if not os.path.exists(Gerber_name.get()):
+  if not os.path.exists(cnf["inputPath"]):
     tkinter.messagebox.showerror("G2G_GUI ERROR", "The path provided for the input Gerber file is invalid.")
     return
 
-  head, tail = os.path.split(Gerber_name.get())
+  head, tail = os.path.split(cnf["inputPath"])
 
   if os.name == 'nt':
-    if not os.path.exists(gerbv_path.get()):
+    if not os.path.exists(cnf["gerbvPath"]):
       tkinter.messagebox.showerror("G2G_GUI ERROR", "The path provided for gerbv is invalid.")
       return
 
-  subprocess.Popen([os.path.normpath(gerbv_path.get()), os.path.normpath(Gerber_name.get())])
+  subprocess.Popen([os.path.normpath(cnf["gerbvPath"]), os.path.normpath(cnf["inputPath"])])
 
 
 
@@ -121,14 +95,15 @@ def main_program():
   #
   # convert file to pic format
   #
+  updateConfigDict()
 
-  if not os.path.exists(Gerber_name.get()):
+  if not os.path.exists(cnf["inputPath"]):
     get_input_filename()
-  if not os.path.exists(Gerber_name.get()):
+  if not os.path.exists(cnf["inputPath"]):
     tkinter.messagebox.showerror("G2G_GUI ERROR", "The path provided for the input Gerber file is invalid.")
     return
 
-  head, tail = os.path.split(Gerber_name.get())
+  head, tail = os.path.split(cnf["inputPath"])
 
   if os.name=='nt':
     temp_pdf = os.path.normpath("%s\_tmp_gerber.pdf" % (head))
@@ -140,23 +115,23 @@ def main_program():
     temp_ps  = "_tmp_gerber.ps"
     temp_pic = "_tmp_gerber.pic"
 
+  gerbv = os.path.normpath(cnf["gerbvPath"])
+  ghostscript = os.path.normpath(cnf["ghostscriptPath"])
+  pstoedit = os.path.normpath(cnf["pstoeditPath"])
+  gerberNormpath = os.path.normpath(cnf["inputPath"])
+
   if os.name=='nt':
-    if not os.path.exists(gerbv_path.get()):
+    if not os.path.exists(gerbv):
       tkinter.messagebox.showerror("G2G_GUI ERROR", "The path provided for gerbv is invalid.")
       return
-
-    if not os.path.exists(pstoedit_path.get()):
+    if not os.path.exists(ghostscript):
+      tkinter.messagebox.showerror("G2G_GUI ERROR", "The path provided for Ghostscript is invalid.")
+      return
+    if not os.path.exists(pstoedit):
       tkinter.messagebox.showerror("G2G_GUI ERROR", "The path provided for pstoedit is invalid.")
       return
 
-    if not os.path.exists(ghostscript_path.get()):
-      tkinter.messagebox.showerror("G2G_GUI ERROR", "The path provided for Ghostscript is invalid.")
-      return
   
-  gerbv = os.path.normpath(gerbv_path.get())
-  ghostscript = os.path.normpath(ghostscript_path.get())
-  pstoedit = os.path.normpath(pstoedit_path.get())
-  gerberNormpath = os.path.normpath(Gerber_name.get())
   if os.name=='nt':
     os.system(f'echo "{gerbv}" --export=pdf --output="{temp_pdf}" --border=0 "{gerberNormpath}" > "{temp_bat}"')
     os.system(f'echo "{ghostscript}" -dNOPAUSE -dBATCH -sDEVICE=ps2write -sOutputFile="{temp_ps}" "{temp_pdf}" >> "{temp_bat}"')
@@ -169,28 +144,10 @@ def main_program():
 
   original_stdout = sys.stdout  # keep a reference to STDOUT
 
-  if Output_name.get():
-    sys.stdout = open(Output_name.get(), 'w')
+  if cnf["outputPath"]:
+    sys.stdout = open(cnf["outputPath"], 'w')
 
-  if not offset_str.get():
-    default_offset_str()
-  if not border_str.get():
-    default_border_str()
-  if not matrix_str.get():
-    default_matrix_str()
-  if not speed_str.get():
-    default_speed_str()
-  if not force_str.get():
-    default_force_str()
-  if not cut_mode_str.get():
-    default_cut_mode_str()
 
-  offset = floats(offset_str.get())
-  border = floats(border_str.get())
-  matrix = floats(matrix_str.get())
-  speed = floats(speed_str.get())
-  force = floats(force_str.get())
-  cut_mode = int(cut_mode_str.get())
 
   #
   # main program
@@ -204,7 +161,8 @@ def main_program():
 
   g.start()
 
-  g.set(offset=(offset[0]+border[0]+0.5,offset[1]+border[1]+0.5), matrix=matrix)
+  border = cnf["border"]
+  g.set(offset=(cnf["offset"][0]+border[0]+0.5,cnf["offset"][1]+border[1]+0.5), matrix=cnf["matrix"])
   strokes = pic.read_pic(temp_pic)
   max_x,max_y = optimize.max_extent(strokes)
 
@@ -217,15 +175,15 @@ def main_program():
     (-border[0], max_y+border[1])
   ]
 
-  if cut_mode==0:
+  if cnf["cutMode"] == 0:
     lines = optimize.optimize(strokes, border)
-    for (s,f) in zip(speed,force):
+    for (s,f) in zip(cnf["speed"], cnf["force"]):
       g.set(speed=s, force=f)
       for x in lines:
         g.line(*x)
       g.closed_path(border_path)
   else:
-    for (s,f) in zip(speed,force):
+    for (s,f) in zip(cnf["speed"], cnf["force"]):
       g.set(speed=s, force=f)
       for s in strokes:
         g.closed_path(s)
@@ -237,33 +195,20 @@ def main_program():
     sys.stdout = original_stdout  # restore STDOUT back to its original value
     tkinter.messagebox.showinfo("G2G_GUI Message", "File '%s' created"  % (Output_name.get()) )
 
-def Save_Configuration():
-    f = open(CONFPATH,'w')
-    f.write(Gerber_name.get() + '\n')
-    f.write(Output_name.get() + '\n')
-    f.write(gerbv_path.get() + '\n')
-    f.write(ghostscript_path.get() + '\n')
-    f.write(pstoedit_path.get() + '\n')
-    f.write(offset_str.get() + '\n')
-    f.write(border_str.get() + '\n')
-    f.write(matrix_str.get() + '\n')
-    f.write(speed_str.get() + '\n')
-    f.write(force_str.get() + '\n')
-    f.write(cut_mode_str.get() + '\n')
-    f.write(cutter_shared_name_str.get() + '\n')
-    f.close()
 
 def Just_Exit():
     top.destroy()
 
-def Send_to_Cutter():
-    if not Output_name.get():
-      get_output_filename()
-    if not Output_name.get():
-      return
-    src=os.path.normpath(Output_name.get())
 
-    if not cutter_shared_name_str.get():
+def Send_to_Cutter():
+    updateConfigDict()
+    if not cnf["outputPath"]:
+      get_output_filename()
+    if not cnf["outputPath"]:
+      return
+    src=os.path.normpath(cnf["outputPath"])
+
+    if cnf["deviceName"] == "":
       tkinter.messagebox.showerror("G2G_GUI ERROR", "The name of the cutter (as a shared printer) was not provided.")
       return
 
@@ -271,11 +216,11 @@ def Send_to_Cutter():
       tkinter.messagebox.showerror("G2G_GUI ERROR", "The Graphtec output file has not been generated, please press the 'Create Graphtec File' button first.")
       return
 
-    #if not os.path.exists(cutter_shared_name_str.get()):
+    #if not os.path.exists(cnf["deviceName"]):
     #  tkinter.messagebox.showerror("G2G_GUI ERROR", "The name of the cutter (as a shared printer) does not exist.")
     #  return
 
-    dst=os.path.normpath(cutter_shared_name_str.get())
+    dst = os.path.normpath(cnf["deviceName"])
     try:
       with open(src, 'r') as f, open(dst, 'w') as lpt:
         while True:
@@ -316,23 +261,13 @@ def get_ghostscript_path():
     if ghostscript_filename:
         ghostscript_path.set(ghostscript_filename)
 
-def default_offset_str():
-    offset_str.set("4.0,0.5")
+def arrToStr(a):
+    return str(a).strip("[]").replace(" ", "")
 
-def default_border_str():
-    border_str.set("1,1")
+def getDefaultValue(key, textfieldStr):
+    defaultValue = config.getDefaultConfig()[key]
+    textfieldStr.set(arrToStr(defaultValue))
 
-def default_matrix_str():
-    matrix_str.set("1,0,0,1")
-
-def default_speed_str():
-    speed_str.set("2,2")
-
-def default_force_str():
-    force_str.set("8,30")
-
-def default_cut_mode_str():
-    cut_mode_str.set("0")
 
 Label(top, text="Gerber File ").grid(row=1, column=0, sticky=W)
 Entry(top, bd =1, width=60, textvariable=Gerber_name).grid(row=1, column=1)
@@ -357,27 +292,27 @@ if os.name=='nt':
 
 Label(top, text="Offset ").grid(row=6, column=0, sticky=W)
 Entry(top, bd =1, width=60, textvariable=offset_str).grid(row=6, column=1)
-tkinter.Button(top, width=9, text = "Default", command = default_offset_str).grid(row=6, column=2)
+tkinter.Button(top, width=9, text = "Default", command = lambda: getDefaultValue("offset", offset_str)).grid(row=6, column=2)
 
 Label(top, text="Border ").grid(row=7, column=0, sticky=W)
 Entry(top, bd =1, width=60, textvariable=border_str).grid(row=7, column=1)
-tkinter.Button(top, width=9, text = "Default", command = default_border_str).grid(row=7, column=2)
+tkinter.Button(top, width=9, text = "Default", command = lambda: getDefaultValue("border", border_str)).grid(row=7, column=2)
 
 Label(top, text="Matrix ").grid(row=8, column=0, sticky=W)
 Entry(top, bd =1, width=60, textvariable=matrix_str).grid(row=8, column=1)
-tkinter.Button(top, width=9, text = "Default", command = default_matrix_str).grid(row=8, column=2)
+tkinter.Button(top, width=9, text = "Default", command = lambda: getDefaultValue("matrix", matrix_str)).grid(row=8, column=2)
 
 Label(top, text="Speed ").grid(row=9, column=0, sticky=W)
 Entry(top, bd =1, width=60, textvariable=speed_str).grid(row=9, column=1)
-tkinter.Button(top, width=9, text = "Default", command = default_speed_str).grid(row=9, column=2)
+tkinter.Button(top, width=9, text = "Default", command = lambda: getDefaultValue("speed", speed_str)).grid(row=9, column=2)
 
 Label(top, text="Force ").grid(row=10, column=0, sticky=W)
 Entry(top, bd =1, width=60, textvariable=force_str).grid(row=10, column=1)
-tkinter.Button(top, width=9, text = "Default", command = default_force_str).grid(row=10, column=2)
+tkinter.Button(top, width=9, text = "Default", command = lambda: getDefaultValue("force", force_str)).grid(row=10, column=2)
 
 Label(top, text="Cut Mode ").grid(row=11, column=0, sticky=W)
 Entry(top, bd =1, width=60, textvariable=cut_mode_str).grid(row=11, column=1)
-tkinter.Button(top, width=9, text = "Default", command = default_cut_mode_str).grid(row=11, column=2)
+tkinter.Button(top, width=9, text = "Default", command = lambda: getDefaultValue("cutMode", cut_mode_str)).grid(row=11, column=2)
 
 if os.name=='nt':
   Label(top, text="Cutter Shared Name").grid(row=12, column=0, sticky=W)
@@ -388,87 +323,37 @@ Entry(top, bd =1, width=60, textvariable=cutter_shared_name_str).grid(row=12, co
 tkinter.Button(top, width=40, text = "Show Gerber", command=show_gerber).grid(row=13, column=1)
 tkinter.Button(top, width=40, text = "Create Graphtec File from input", command = main_program).grid(row=14, column=1)
 tkinter.Button(top, width=40, text = "Send Graphtec File to Silhouette Cutter", command = Send_to_Cutter).grid(row=15, column=1)
-tkinter.Button(top, width=40, text = "Save Configuration", command = Save_Configuration).grid(row=16, column=1)
+tkinter.Button(top, width=40, text = "Save Configuration", command = saveConfig).grid(row=16, column=1)
 tkinter.Button(top, width=40, text = "Exit", command = Just_Exit).grid(row=17, column=1)
 tkinter.Button(top, width=40, text = "Create force testing Graphtec file", command=test_forces).grid(row=18, column=1)
 
 
-if path.isfile(CONFPATH) and access(CONFPATH, R_OK):
-    f = open(CONFPATH,'r')
-    input_filename = f.readline()
-    input_filename = input_filename.strip()
-    output_filename = f.readline()
-    output_filename = output_filename.strip()
-    gerbv_filename = f.readline()
-    gerbv_filename = gerbv_filename.strip()
-    ghostscript_filename = f.readline()
-    ghostscript_filename = ghostscript_filename.strip()
-    pstoedit_filename = f.readline()
-    pstoedit_filename = pstoedit_filename.strip()
-    offset_text =  f.readline()
-    offset_text = offset_text.strip()
-    border_text =  f.readline()
-    border_text = border_text.strip()
-    matrix_text =  f.readline()
-    matrix_text = matrix_text.strip()
-    speed_text =  f.readline()
-    speed_text = speed_text.strip()
-    force_text =  f.readline()
-    force_text = force_text.strip()
-    cut_mode_text =  f.readline()
-    cut_mode_text = cut_mode_text.strip()
-    cutter_shared_name_text =  f.readline()
-    cutter_shared_name_text = cutter_shared_name_text.strip()
-    f.close()
+def updateConfigDict():
+    cnf["inputPath"] = Gerber_name.get()
+    cnf["outputPath"] = Output_name.get()
+    cnf["gerbvPath"] = gerbv_path.get()
+    cnf["ghostscriptPath"] = ghostscript_path.get()
+    cnf["pstoeditPath"] = pstoedit_path.get()
+    cnf["offset"] = floats(offset_str.get())
+    cnf["border"] = floats(border_str.get())
+    cnf["matrix"] = floats(matrix_str.get())
+    cnf["speed"] = floats(speed_str.get())
+    cnf["force"] = floats(force_str.get())
+    cnf["cutMode"] = int(cut_mode_str.get())
+    cnf["deviceName"] = cutter_shared_name_str.get()
 
-if not input_filename:
-    input_filename=""
-if not output_filename:
-    output_filename="result.txt"
-if not gerbv_filename:
-    if os.name=='nt':
-        gerbv_filename="C:/Program Files (x86)/gerbv-2.6.0/bin/gerbv.exe"
-    else:
-        gerbv_filename="gerbv"
-if not ghostscript_filename:
-    if os.name=='nt':
-        ghostscript_filename="C:/Program Files/gs/gs9.56.1/bin/gswin64.exe"
-    else:
-        ghostscript_filename="gs"
-if not pstoedit_filename:
-    if os.name=='nt':
-        pstoedit_filename="C:/Program Files/pstoedit/pstoedit.exe"
-    else:
-        pstoedit_filename="pstoedit"
-if not offset_text:
-    offset_text="4.0,0.5"
-if not border_text:
-    border_text="1,1"
-if not matrix_text:
-    matrix_text="1,0,0,1"
-if not speed_text:
-    speed_text="2,2"
-if not force_text:
-    force_text="8,30"
-if not cut_mode_text:
-    cut_mode_text="0"
-if not cutter_shared_name_text:
-    if os.name=='nt':
-        cutter_shared_name_text="\\\\[Computer Name]\\[Shared Name]"
-    else:
-        cutter_shared_name_text="/dev/usb/lp0"
 
-Gerber_name.set(input_filename)
-Output_name.set(output_filename)
-gerbv_path.set(gerbv_filename)
-ghostscript_path.set(ghostscript_filename)
-pstoedit_path.set(pstoedit_filename)
-offset_str.set(offset_text)
-border_str.set(border_text)
-matrix_str.set(matrix_text)
-speed_str.set(speed_text)
-force_str.set(force_text)
-cut_mode_str.set(cut_mode_text)
-cutter_shared_name_str.set(cutter_shared_name_text)
+Gerber_name.set(cnf["inputPath"])
+Output_name.set(cnf["outputPath"])
+gerbv_path.set(cnf["gerbvPath"])
+ghostscript_path.set(cnf["ghostscriptPath"])
+pstoedit_path.set(cnf["pstoeditPath"])
+offset_str.set(arrToStr(cnf["offset"]))
+border_str.set(arrToStr(cnf["border"]))
+matrix_str.set(arrToStr(cnf["matrix"]))
+speed_str.set(arrToStr(cnf["speed"]))
+force_str.set(arrToStr(cnf["force"]))
+cut_mode_str.set(cnf["cutMode"])
+cutter_shared_name_str.set(cnf["deviceName"])
 
 top.mainloop()
