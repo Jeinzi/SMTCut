@@ -75,11 +75,15 @@ def main():
         print("ERROR: Could not find 'inkscape' in your PATH. Exiting.")
         sys.exit(1)
 
+    # Check if file exists.
+    if not os.path.isfile(args.input_filename):
+        print(f"ERROR: File '{args.input_filename}' can't be found. Exiting.")
+        sys.exit(1)
 
     # If file is not a PDF, try to convert it to one.
     if extension != "pdf":
       if extension in allowed_inkscape_extensions:
-        os.system(f"inkscape --export-filename={temp_pdf} {pdf_filename}")
+        os.system(f"inkscape --export-filename={temp_pdf} {args.input_filename}")
       else:
         os.system(f"gerbv --export=pdf --output='{temp_pdf}' --border=0 '{args.input_filename}'")
       pdf_filename = temp_pdf
