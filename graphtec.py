@@ -1,6 +1,9 @@
+#!/usr/bin/env python3
+
+# Communicate with a Graphtec printer. (Silhouette Cameo or Portrait)
 #
-# communicate with a graphtec printer (Silhouette Cameo or Portrait)
-#
+# Licensed under the terms of the GPL2, see LICENSE file.
+# Copyright (c) 2012-2013 Peter Monta <pmonta@gmail.com>
 
 import sys
 import math

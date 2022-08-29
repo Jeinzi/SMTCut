@@ -1,4 +1,10 @@
-# optimize paths for the graphtec cutter by dicing into individual lines, sorting by angle
+#!/usr/bin/env python3
+
+# Optimize paths for the Graphtec cutter by dicing into individual
+# lines, sorting by angle.
+#
+# Licensed under the terms of the GPL2, see LICENSE file.
+# Copyright (c) 2012-2013 Peter Monta <pmonta@gmail.com>
 
 import math
 

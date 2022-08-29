@@ -1,12 +1,12 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
+# Cut fine-pitch SMT stencils from a gerber/PDF/SVG/DXF file using
+# a Graphtec craft/vinyl cutter. (e.g. Silhouette Cameo or Portrait)
 #
-# gerber2graphtec
-#
-# Cut fine-pitch SMT stencils from a gerber file using a Graphtec craft/vinyl cutter (e.g. Silhouette Cameo or Portrait)
-#
+# Licensed under the terms of the GPL2, see LICENSE file.
 # Copyright (c) 2012 Peter Monta <pmonta@gmail.com>
-#
+# Copyright (c) 2015 Philipp Klaus <philipp.klaus@gmail.com>
+# Copyright (c) 2022 Julian Heinzel <jeinzi@gmx.de>
 
 import sys
 import os

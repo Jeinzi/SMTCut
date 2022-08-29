@@ -1,6 +1,12 @@
-# dump strokes to an svg
+#!/usr/bin/env python3
+
+# Dump strokes to an SVG file.
+#
+# Licensed under the terms of the GPL2, see LICENSE file.
+# Copyright (c) 2017 fishpepper <fishpepper@gmail.com>
+
 import svgwrite
-from svgwrite import cm, mm   
+from svgwrite import cm, mm
 
 class svgwriter:
     def __init__(self, filename):

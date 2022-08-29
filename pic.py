@@ -1,4 +1,10 @@
-# read paths from a pic file produced by "pstoedit -f pic"
+#!/usr/bin/env python3
+
+# Read paths from a PIC file produced by "pstoedit -f pic".
+#
+# Licensed under the terms of the GPL2, see LICENSE file.
+# Copyright (c) 2012 Peter Monta <pmonta@gmail.com>
+
 
 def read_pic(filename):
   strokes = []

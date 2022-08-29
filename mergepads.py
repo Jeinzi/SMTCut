@@ -1,4 +1,10 @@
-# merge multiple small pads to one big pad spanning the same area
+#!/usr/bin/env python3
+
+# Merge multiple small pads into one big pad spanning the same area.
+#
+# Licensed under the terms of the GPL2, see LICENSE file.
+# Copyright (c) 2017 fishpepper <fishpepper@gmail.com>
+
 import math
 import numpy as np
 from scipy.spatial import ConvexHull
@@ -17,7 +23,7 @@ def minimum_bounding_rectangle(npoints, scale = 1.0):
     """
     Find the smallest bounding rectangle for a set of points.
     Returns a set of points representing the corners of the bounding box.
-    source: 
+    source:
     https://gis.stackexchange.com/questions/22895/finding-minimum-area-rectangle-for-given-points
 
     :param points: an nx2 matrix of coordinates
@@ -201,7 +207,7 @@ def fix_small_geometry(strokes, min_size, min_dist):
         bbox = minimum_bounding_rectangle(points, scale = scale)
 
         # make sure to close polygon
-        smallrect_strokes.append(bbox + [bbox[0]])         
+        smallrect_strokes.append(bbox + [bbox[0]])
 
     
     if (DEBUG_SVG):
@@ -212,5 +218,5 @@ def fix_small_geometry(strokes, min_size, min_dist):
         svg.draw_polygon(small_rects, 'red')
         svg.finish()
 
-    return smallrect_strokes + processed_strokes 
+    return smallrect_strokes + processed_strokes
 

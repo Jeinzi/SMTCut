@@ -1,4 +1,10 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
+
+# Licensed under the terms of the GPL2, see LICENSE file.
+# Copyright (c) 2013 jesuscfv <jesus.cfv@gmail.com>
+# Copyright (c) 2014 Colin O'Flynn <coflynn@newae.com>
+# Copyright (c) 2022 Julian Heinzel <jeinzi@gmx.de>
+
 import tkinter
 import sys
 import os

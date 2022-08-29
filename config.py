@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-#
 # Read & write configuration files and provide default values.
 #
 # Licensed under the terms of the GPL2, see LICENSE file.
