@@ -268,51 +268,26 @@ def getDefaultValue(key, textfieldStr):
     defaultValue = config.getDefaultConfig()[key]
     textfieldStr.set(arrToStr(defaultValue))
 
+row = 1
+def addInputRow(title, textVariable, buttonText, command, row):
+    Label(top, text=title).grid(row=row, column=0, sticky=W)
+    Entry(top, bd=1, width=60, textvariable=textVariable).grid(row=row, column=1)
+    tkinter.Button(top, width=9, text=buttonText, command=command).grid(row=row, column=2)
 
-Label(top, text="Gerber File ").grid(row=1, column=0, sticky=W)
-Entry(top, bd =1, width=60, textvariable=Gerber_name).grid(row=1, column=1)
-tkinter.Button(top, width=9, text = "Browse", command = get_input_filename).grid(row=1, column=2)
-
-Label(top, text="Output File ").grid(row=2, column=0, sticky=W)
-Entry(top, bd =1, width=60, textvariable=Output_name).grid(row=2, column=1)
-tkinter.Button(top, width=9, text = "Browse", command = get_output_filename).grid(row=2, column=2)
+addInputRow("Input File", Gerber_name, "Browse", get_input_filename, 1)
+addInputRow("Output File", Output_name, "Browse", get_output_filename, 2)
 
 if os.name=='nt':
-  Label(top, text="gerbv path ").grid(row=3, column=0, sticky=W)
-  Entry(top, bd =1, width=60, textvariable=gerbv_path).grid(row=3, column=1)
-  tkinter.Button(top, width=9, text = "Browse", command = get_gerbv_path).grid(row=3, column=2)
+  addInputRow("gerbv path", gerbv_path, "Browse", get_gerbv_path, 3)
+  addInputRow("Ghostscript path", ghostscript_path, "Browse", get_ghostscript_path, 4)
+  addInputRow("pstoedit path", pstoedit_path, "Browse", get_pstoedit_path, 5)
 
-  Label(top, text="Ghostscript path ").grid(row=4, column=0, sticky=W)
-  Entry(top, bd =1, width=60, textvariable=ghostscript_path).grid(row=4, column=1)
-  tkinter.Button(top, width=9, text = "Browse", command = get_ghostscript_path).grid(row=4, column=2)
-
-  Label(top, text="pstoedit path ").grid(row=5, column=0, sticky=W)
-  Entry(top, bd =1, width=60, textvariable=pstoedit_path).grid(row=5, column=1)
-  tkinter.Button(top, width=9, text = "Browse", command = get_pstoedit_path).grid(row=5, column=2)
-
-Label(top, text="Offset ").grid(row=6, column=0, sticky=W)
-Entry(top, bd =1, width=60, textvariable=offset_str).grid(row=6, column=1)
-tkinter.Button(top, width=9, text = "Default", command = lambda: getDefaultValue("offset", offset_str)).grid(row=6, column=2)
-
-Label(top, text="Border ").grid(row=7, column=0, sticky=W)
-Entry(top, bd =1, width=60, textvariable=border_str).grid(row=7, column=1)
-tkinter.Button(top, width=9, text = "Default", command = lambda: getDefaultValue("border", border_str)).grid(row=7, column=2)
-
-Label(top, text="Matrix ").grid(row=8, column=0, sticky=W)
-Entry(top, bd =1, width=60, textvariable=matrix_str).grid(row=8, column=1)
-tkinter.Button(top, width=9, text = "Default", command = lambda: getDefaultValue("matrix", matrix_str)).grid(row=8, column=2)
-
-Label(top, text="Speed ").grid(row=9, column=0, sticky=W)
-Entry(top, bd =1, width=60, textvariable=speed_str).grid(row=9, column=1)
-tkinter.Button(top, width=9, text = "Default", command = lambda: getDefaultValue("speed", speed_str)).grid(row=9, column=2)
-
-Label(top, text="Force ").grid(row=10, column=0, sticky=W)
-Entry(top, bd =1, width=60, textvariable=force_str).grid(row=10, column=1)
-tkinter.Button(top, width=9, text = "Default", command = lambda: getDefaultValue("force", force_str)).grid(row=10, column=2)
-
-Label(top, text="Cut Mode ").grid(row=11, column=0, sticky=W)
-Entry(top, bd =1, width=60, textvariable=cut_mode_str).grid(row=11, column=1)
-tkinter.Button(top, width=9, text = "Default", command = lambda: getDefaultValue("cutMode", cut_mode_str)).grid(row=11, column=2)
+addInputRow("Offset", offset_str, "Default", lambda: getDefaultValue("offset", offset_str), 6)
+addInputRow("Border", border_str, "Default", lambda: getDefaultValue("border", border_str), 7)
+addInputRow("Matrix", matrix_str, "Default", lambda: getDefaultValue("matrix", matrix_str), 8)
+addInputRow("Speed", speed_str, "Default", lambda: getDefaultValue("speed", speed_str), 9)
+addInputRow("Force", force_str, "Default", lambda: getDefaultValue("force", force_str), 10)
+addInputRow("Cut Mode", cut_mode_str, "Default", lambda: getDefaultValue("cutMode", cut_mode_str), 11)
 
 if os.name=='nt':
   Label(top, text="Cutter Shared Name").grid(row=12, column=0, sticky=W)
@@ -324,8 +299,8 @@ tkinter.Button(top, width=40, text = "Show Gerber", command=show_gerber).grid(ro
 tkinter.Button(top, width=40, text = "Create Graphtec File from input", command = main_program).grid(row=14, column=1)
 tkinter.Button(top, width=40, text = "Send Graphtec File to Silhouette Cutter", command = Send_to_Cutter).grid(row=15, column=1)
 tkinter.Button(top, width=40, text = "Save Configuration", command = saveConfig).grid(row=16, column=1)
-tkinter.Button(top, width=40, text = "Exit", command = Just_Exit).grid(row=17, column=1)
-tkinter.Button(top, width=40, text = "Create force testing Graphtec file", command=test_forces).grid(row=18, column=1)
+tkinter.Button(top, width=40, text = "Create force testing Graphtec file", command=test_forces).grid(row=17, column=1)
+tkinter.Button(top, width=40, text = "Exit", command = Just_Exit).grid(row=18, column=1)
 
 
 def updateConfigDict():
