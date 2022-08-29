@@ -69,7 +69,7 @@ def test_forces():
 
   if cnf["outputPath"]:
     sys.stdout = original_stdout  # restore STDOUT back to its original value
-    tkinter.messagebox.showinfo("G2G_GUI Message", "File '%s' created" % (cnf["outputPath"]))
+    tkinter.messagebox.showinfo("G2G_GUI Message", f"File '{cnf['outputPath']}' created")
 
 
 
@@ -109,10 +109,10 @@ def main_program():
   head, tail = os.path.split(cnf["inputPath"])
 
   if os.name=='nt':
-    temp_pdf = os.path.normpath("%s\_tmp_gerber.pdf" % (head))
-    temp_ps  = os.path.normpath("%s\_tmp_gerber.ps"  % (head))
-    temp_pic = os.path.normpath("%s\_tmp_gerber.pic" % (head))
-    temp_bat = os.path.normpath("%s\_tmp_gerber.bat" % (head))
+    temp_pdf = os.path.normpath(f"{head}\_tmp_gerber.pdf")
+    temp_ps  = os.path.normpath(f"{head}\_tmp_gerber.ps" )
+    temp_pic = os.path.normpath(f"{head}\_tmp_gerber.pic")
+    temp_bat = os.path.normpath(f"{head}\_tmp_gerber.bat")
   else:
     temp_pdf = "_tmp_gerber.pdf"
     temp_ps  = "_tmp_gerber.ps"
@@ -196,7 +196,7 @@ def main_program():
 
   if Output_name.get():
     sys.stdout = original_stdout  # restore STDOUT back to its original value
-    tkinter.messagebox.showinfo("G2G_GUI Message", "File '%s' created"  % (Output_name.get()) )
+    tkinter.messagebox.showinfo("G2G_GUI Message", f"File '{Output_name.get()}' created")
 
 
 def Just_Exit():
