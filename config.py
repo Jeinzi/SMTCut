@@ -31,7 +31,10 @@ defaultConfig = {
     "border": [1,1],
     "matrix": [1,0,0,1],
     "speed": [2,2],
-    "force": [12,40],
+    "force": [8,30],
+    "mergeThreshold": [0.012, 0.01],
+    "mediaSize": [12,11],
+    "merge": 0,
     "cutMode": 0,
     "deviceName": {
         "posix": "/dev/usb/lp0",

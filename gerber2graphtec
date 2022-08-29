@@ -8,43 +8,50 @@
 # Copyright (c) 2015 Philipp Klaus <philipp.klaus@gmail.com>
 # Copyright (c) 2022 Julian Heinzel <jeinzi@gmx.de>
 
-import sys
 import os
+import sys
 import argparse
-
-import graphtec
-import pic
-import optimize
 import distutils
 
-merge_threshold = [0.012, 0.01]
-
+import pic
+import config
+import graphtec
+import optimize
 
 
 
 def main():
     # Parse arguments.
+    cnf = config.getDefaultConfig()
     floats = lambda s: map(float, s.split(','))
+    formatList = lambda a: str(a).strip("[]").replace(" ", "")
+
+    # Format default values.
+    dOffset = formatList(cnf["offset"])
+    dBorder = formatList(cnf["border"])
+    dMatrix = formatList(cnf["matrix"])
+    dSpeed  = formatList(cnf["speed"])
+    dMediaSize = formatList(cnf["mediaSize"]).replace(",", "×")
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--offset', type=floats, default=[4,0.5],
-        help='translate to device coordinates x,y (inches) (default: 4,0.5)')
-    parser.add_argument('--border', type=floats, default=[1,1],
-        help='cut a border around the bounding box of the gerber file; 0,0 to disable (default: 1,1)')
-    parser.add_argument('--matrix', type=floats, default=[1,0,0,1],
-        help='transform coordinates by [a b;c d] (default: identity transform 1,0,0,1)')
-    parser.add_argument('--speed', type=floats, default=[2,2],
-        help='use speed s in device units; s2,s3 for multiple passes (default: 2 passes, speed 2 in each pass)')
-    parser.add_argument('--force', type=floats, default=[8,30],
-        help='use force f in device units; f2,f3 for multiple passes (default: first pass 8, second pass 30)')
-    parser.add_argument('--cut_mode', type=int, choices=[0,1], default=0,
-        help='0 for highest accuracy (fine pitch), 1 for highest speed (default: 0)')
-    parser.add_argument('--media_size', type=floats, default=[12,11],
-        help='size of media (default: 12x11 inches)')
+    parser.add_argument('--offset', type=floats, default=cnf["offset"],
+        help=f'translate to device coordinates x,y (inches) (default: {dOffset})')
+    parser.add_argument('--border', type=floats, default=cnf["border"],
+        help=f'cut a border around the bounding box of the gerber file; 0,0 to disable (default: {dBorder})')
+    parser.add_argument('--matrix', type=floats, default=cnf["matrix"],
+        help=f'transform coordinates by [a b;c d] (default: identity transform {dMatrix})')
+    parser.add_argument('--speed', type=floats, default=cnf["speed"],
+        help=f'use speed s in device units; s2,s3 for multiple passes (default: {dSpeed})')
+    parser.add_argument('--force', type=floats, default=cnf["force"],
+        help=f'use force f in device units; f2,f3 for multiple passes (default: first pass {cnf["force"][0]}, second pass {cnf["force"][1]})')
+    parser.add_argument('--cut_mode', type=int, choices=[0,1], default=cnf["cutMode"],
+        help=f'0 for highest accuracy (fine pitch), 1 for highest speed (default: {cnf["cutMode"]})')
+    parser.add_argument('--media_size', type=floats, default=cnf["mediaSize"],
+        help=f'size of media (default: {dMediaSize} inches)')
     parser.add_argument('--rotate', type=float, dest='theta', default=0.,
-        help='rotate counterclockwise by theta degrees (default: no rotation)')
-    parser.add_argument('--merge', type=int, choices=[0,1], default=0,
-        help='merge close smaller structures into one big cutout (default: 0)')
+        help=f'rotate counterclockwise by theta degrees (default: no rotation)')
+    parser.add_argument('--merge', type=int, choices=[0,1], default=cnf["merge"],
+        help=f'merge close smaller structures into one big cutout (default: {cnf["merge"]})')
     parser.add_argument('input_filename')
     args = parser.parse_args()
 
@@ -95,7 +102,7 @@ def main():
     # Optionally merge multiple smaller pads into bigger pads spanning the same area.
     if not args.merge == 0:
       import mergepads
-      strokes = mergepads.fix_small_geometry(strokes, merge_threshold[0], merge_threshold[1])
+      strokes = mergepads.fix_small_geometry(strokes, cnf["mergeThreshold"][0], cnf["mergeThreshold"][1])
 
     strokes = optimize.rotate(strokes, args.theta)
     strokes = optimize.justify(strokes)
