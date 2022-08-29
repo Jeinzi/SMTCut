@@ -14,24 +14,21 @@ from tkinter import *
 from tkinter import filedialog, messagebox
 from os import path, access, R_OK, W_OK
 
-top = tkinter.Tk()
-top.title("Gerber to Graphtec")
-
-Gerber_name = StringVar()
-Output_name = StringVar()
-gerbv_path = StringVar()
-ghostscript_path  = StringVar()
-pstoedit_path  = StringVar()
-offset_str  = StringVar()
-border_str  = StringVar()
-matrix_str  = StringVar()
-speed_str  = StringVar()
-force_str  = StringVar()
-cut_mode_str  = StringVar()
-cutter_shared_name_str  = StringVar()
 
 
-cnf = config.getConfig()
+def updateConfigDict():
+    cnf["inputPath"] = Gerber_name.get()
+    cnf["outputPath"] = Output_name.get()
+    cnf["gerbvPath"] = gerbv_path.get()
+    cnf["ghostscriptPath"] = ghostscript_path.get()
+    cnf["pstoeditPath"] = pstoedit_path.get()
+    cnf["offset"] = floats(offset_str.get())
+    cnf["border"] = floats(border_str.get())
+    cnf["matrix"] = floats(matrix_str.get())
+    cnf["speed"] = floats(speed_str.get())
+    cnf["force"] = floats(force_str.get())
+    cnf["cutMode"] = int(cut_mode_str.get())
+    cnf["deviceName"] = cutter_shared_name_str.get()
 
 
 def floats(s):
@@ -268,67 +265,68 @@ def getDefaultValue(key, textfieldStr):
     defaultValue = config.getDefaultConfig()[key]
     textfieldStr.set(arrToStr(defaultValue))
 
-row = 1
-def addInputRow(title, textVariable, buttonText, command, row):
-    Label(top, text=title).grid(row=row, column=0, sticky=W)
-    Entry(top, bd=1, width=60, textvariable=textVariable).grid(row=row, column=1)
-    tkinter.Button(top, width=9, text=buttonText, command=command).grid(row=row, column=2)
-
-addInputRow("Input File", Gerber_name, "Browse", get_input_filename, 1)
-addInputRow("Output File", Output_name, "Browse", get_output_filename, 2)
-
-if os.name=='nt':
-  addInputRow("gerbv path", gerbv_path, "Browse", get_gerbv_path, 3)
-  addInputRow("Ghostscript path", ghostscript_path, "Browse", get_ghostscript_path, 4)
-  addInputRow("pstoedit path", pstoedit_path, "Browse", get_pstoedit_path, 5)
-
-addInputRow("Offset", offset_str, "Default", lambda: getDefaultValue("offset", offset_str), 6)
-addInputRow("Border", border_str, "Default", lambda: getDefaultValue("border", border_str), 7)
-addInputRow("Matrix", matrix_str, "Default", lambda: getDefaultValue("matrix", matrix_str), 8)
-addInputRow("Speed", speed_str, "Default", lambda: getDefaultValue("speed", speed_str), 9)
-addInputRow("Force", force_str, "Default", lambda: getDefaultValue("force", force_str), 10)
-addInputRow("Cut Mode", cut_mode_str, "Default", lambda: getDefaultValue("cutMode", cut_mode_str), 11)
-
-if os.name=='nt':
-  Label(top, text="Cutter Shared Name").grid(row=12, column=0, sticky=W)
-else:
-  Label(top, text="Cutter Device Name").grid(row=12, column=0, sticky=W)
-Entry(top, bd =1, width=60, textvariable=cutter_shared_name_str).grid(row=12, column=1, sticky=E)
-
-tkinter.Button(top, width=40, text = "Show Gerber", command=show_gerber).grid(row=13, column=1)
-tkinter.Button(top, width=40, text = "Create Graphtec File from input", command = main_program).grid(row=14, column=1)
-tkinter.Button(top, width=40, text = "Send Graphtec File to Silhouette Cutter", command = Send_to_Cutter).grid(row=15, column=1)
-tkinter.Button(top, width=40, text = "Save Configuration", command = saveConfig).grid(row=16, column=1)
-tkinter.Button(top, width=40, text = "Create force testing Graphtec file", command=test_forces).grid(row=17, column=1)
-tkinter.Button(top, width=40, text = "Exit", command = Just_Exit).grid(row=18, column=1)
 
 
-def updateConfigDict():
-    cnf["inputPath"] = Gerber_name.get()
-    cnf["outputPath"] = Output_name.get()
-    cnf["gerbvPath"] = gerbv_path.get()
-    cnf["ghostscriptPath"] = ghostscript_path.get()
-    cnf["pstoeditPath"] = pstoedit_path.get()
-    cnf["offset"] = floats(offset_str.get())
-    cnf["border"] = floats(border_str.get())
-    cnf["matrix"] = floats(matrix_str.get())
-    cnf["speed"] = floats(speed_str.get())
-    cnf["force"] = floats(force_str.get())
-    cnf["cutMode"] = int(cut_mode_str.get())
-    cnf["deviceName"] = cutter_shared_name_str.get()
 
+if __name__ == "__main__":
+    top = tkinter.Tk()
+    top.title("Gerber to Graphtec")
+    cnf = config.getConfig()
 
-Gerber_name.set(cnf["inputPath"])
-Output_name.set(cnf["outputPath"])
-gerbv_path.set(cnf["gerbvPath"])
-ghostscript_path.set(cnf["ghostscriptPath"])
-pstoedit_path.set(cnf["pstoeditPath"])
-offset_str.set(arrToStr(cnf["offset"]))
-border_str.set(arrToStr(cnf["border"]))
-matrix_str.set(arrToStr(cnf["matrix"]))
-speed_str.set(arrToStr(cnf["speed"]))
-force_str.set(arrToStr(cnf["force"]))
-cut_mode_str.set(cnf["cutMode"])
-cutter_shared_name_str.set(cnf["deviceName"])
+    # Create variables that bind to text fields and fill them with
+    # values from config manager.
+    Gerber_name = StringVar(top, cnf["inputPath"])
+    Output_name = StringVar(top, cnf["outputPath"])
+    gerbv_path = StringVar(top, cnf["gerbvPath"])
+    ghostscript_path = StringVar(top, cnf["ghostscriptPath"])
+    pstoedit_path = StringVar(top, cnf["pstoeditPath"])
+    offset_str = StringVar(top, arrToStr(cnf["offset"]))
+    border_str = StringVar(top, arrToStr(cnf["border"]))
+    matrix_str = StringVar(top, arrToStr(cnf["matrix"]))
+    speed_str = StringVar(top, arrToStr(cnf["speed"]))
+    force_str = StringVar(top, arrToStr(cnf["force"]))
+    cut_mode_str = StringVar(top, cnf["cutMode"])
+    cutter_shared_name_str = StringVar(top, cnf["deviceName"])
 
-top.mainloop()
+    # Add input text fields.
+    row = 1
+    def addInputRow(title, textVariable, buttonText, command):
+        global row
+        Label(top, text=title).grid(row=row, column=0, sticky=W)
+        Entry(top, bd=1, width=60, textvariable=textVariable).grid(row=row, column=1)
+        tkinter.Button(top, width=9, text=buttonText, command=command).grid(row=row, column=2)
+        row += 1
+
+    addInputRow("Input File", Gerber_name, "Browse", get_input_filename)
+    addInputRow("Output File", Output_name, "Browse", get_output_filename)
+
+    if os.name == "nt":
+        addInputRow("gerbv path", gerbv_path, "Browse", get_gerbv_path)
+        addInputRow("Ghostscript path", ghostscript_path, "Browse", get_ghostscript_path)
+        addInputRow("pstoedit path", pstoedit_path, "Browse", get_pstoedit_path)
+
+    addInputRow("Offset", offset_str, "Default", lambda: getDefaultValue("offset", offset_str))
+    addInputRow("Border", border_str, "Default", lambda: getDefaultValue("border", border_str))
+    addInputRow("Matrix", matrix_str, "Default", lambda: getDefaultValue("matrix", matrix_str))
+    addInputRow("Speed", speed_str, "Default", lambda: getDefaultValue("speed", speed_str))
+    addInputRow("Force", force_str, "Default", lambda: getDefaultValue("force", force_str))
+    addInputRow("Cut Mode", cut_mode_str, "Default", lambda: getDefaultValue("cutMode", cut_mode_str))
+
+    labelText = "Cutter Shared Name" if os.name == "nt" else "Cutter Device Name"
+    Label(top, text=labelText).grid(row=row, column=0, sticky=W)
+    Entry(top, bd =1, width=60, textvariable=cutter_shared_name_str).grid(row=row, column=1, sticky=E)
+    row += 1
+
+    # Create main button area.
+    def addButtonRow(text, command):
+        global row
+        tkinter.Button(top, width=40, text=text, command=command).grid(row=row, column=1)
+        row += 1
+    addButtonRow("Show Gerber", show_gerber)
+    addButtonRow("Create Graphtec File from input", main_program)
+    addButtonRow("Send Graphtec File to Silhouette Cutter", Send_to_Cutter)
+    addButtonRow("Save Configuration", saveConfig)
+    addButtonRow("Create force testing Graphtec file", test_forces)
+    addButtonRow("Exit", Just_Exit)
+
+    top.mainloop()
