@@ -5,21 +5,15 @@
 # Copyright (c) 2014 Colin O'Flynn <coflynn@newae.com>
 # Copyright (c) 2022 Julian Heinzel <jeinzi@gmx.de>
 
-import tkinter
 import sys
 import os
-import string
 import subprocess
+import tkinter, tkinter.messagebox, tkinter.filedialog
 
 import graphtec
 import pic
 import optimize
 import config
-
-from tkinter import *
-from tkinter import filedialog, messagebox
-from os import path, access, R_OK, W_OK
-
 
 
 def updateConfigDict():
@@ -95,9 +89,7 @@ def show_gerber():
 
 
 def main_program():
-  #
-  # convert file to pic format
-  #
+  # Convert file to PIC format.
   updateConfigDict()
 
   if not os.path.exists(cnf["inputPath"]):
@@ -151,25 +143,14 @@ def main_program():
     sys.stdout = open(cnf["outputPath"], 'w')
 
 
-
-  #
-  # main program
-  #
-
-  import graphtec
-  import pic
-  import optimize
-
+  # Main program.
   g = graphtec.graphtec()
-
   g.start()
 
   border = cnf["border"]
   g.set(offset=(cnf["offset"][0]+border[0]+0.5,cnf["offset"][1]+border[1]+0.5), matrix=cnf["matrix"])
   strokes = pic.read_pic(temp_pic)
   max_x,max_y = optimize.max_extent(strokes)
-
-  tx,ty = 0.5,0.5
 
   border_path = [
     (-border[0], -border[1]),
@@ -219,10 +200,6 @@ def Send_to_Cutter():
       tkinter.messagebox.showerror("G2G_GUI ERROR", "The Graphtec output file has not been generated, please press the 'Create Graphtec File' button first.")
       return
 
-    #if not os.path.exists(cnf["deviceName"]):
-    #  tkinter.messagebox.showerror("G2G_GUI ERROR", "The name of the cutter (as a shared printer) does not exist.")
-    #  return
-
     dst = os.path.normpath(cnf["deviceName"])
     try:
       with open(src, 'r') as f, open(dst, 'w') as lpt:
@@ -234,10 +211,6 @@ def Send_to_Cutter():
       tkinter.messagebox.showerror("G2G_GUI ERROR", "There was an error sending the Graphtec file to the plotter")
       return
 
-#    if os.name=='nt':
-#      os.system("copy /B \"%s\" \"%s\"" % (src, dst))
-#    else:
-#      os.system("cat %s > %s" % (src, dst))
 
 def get_input_filename():
     input_filename=tkinter.filedialog.askopenfilename(title='Select paste mask Gerber file', filetypes=[('Gerber File', ('*.g*', '*.G*')),("All files", "*.*")])
@@ -291,25 +264,25 @@ if __name__ == "__main__":
 
     # Create variables that bind to text fields and fill them with
     # values from config manager.
-    Gerber_name = StringVar(top, cnf["inputPath"])
-    Output_name = StringVar(top, cnf["outputPath"])
-    gerbv_path = StringVar(top, cnf["gerbvPath"])
-    ghostscript_path = StringVar(top, cnf["ghostscriptPath"])
-    pstoedit_path = StringVar(top, cnf["pstoeditPath"])
-    offset_str = StringVar(top, arrToStr(cnf["offset"]))
-    border_str = StringVar(top, arrToStr(cnf["border"]))
-    matrix_str = StringVar(top, arrToStr(cnf["matrix"]))
-    speed_str = StringVar(top, arrToStr(cnf["speed"]))
-    force_str = StringVar(top, arrToStr(cnf["force"]))
-    cut_mode_str = StringVar(top, cnf["cutMode"])
-    cutter_shared_name_str = StringVar(top, cnf["deviceName"])
+    Gerber_name = tkinter.StringVar(top, cnf["inputPath"])
+    Output_name = tkinter.StringVar(top, cnf["outputPath"])
+    gerbv_path = tkinter.StringVar(top, cnf["gerbvPath"])
+    ghostscript_path = tkinter.StringVar(top, cnf["ghostscriptPath"])
+    pstoedit_path = tkinter.StringVar(top, cnf["pstoeditPath"])
+    offset_str = tkinter.StringVar(top, arrToStr(cnf["offset"]))
+    border_str = tkinter.StringVar(top, arrToStr(cnf["border"]))
+    matrix_str = tkinter.StringVar(top, arrToStr(cnf["matrix"]))
+    speed_str = tkinter.StringVar(top, arrToStr(cnf["speed"]))
+    force_str = tkinter.StringVar(top, arrToStr(cnf["force"]))
+    cut_mode_str = tkinter.StringVar(top, cnf["cutMode"])
+    cutter_shared_name_str = tkinter.StringVar(top, cnf["deviceName"])
 
     # Add input text fields.
     row = 1
     def addInputRow(title, textVariable, buttonText, command):
         global row
-        Label(top, text=title).grid(row=row, column=0, sticky=W)
-        entry = Entry(top, bd=1, width=60, textvariable=textVariable)
+        tkinter.Label(top, text=title).grid(row=row, column=0, sticky=tkinter.W)
+        entry = tkinter.Entry(top, bd=1, width=60, textvariable=textVariable)
         entry.bind('<Control-a>', selectAll)
         entry.grid(row=row, column=1)
         if buttonText != "":
