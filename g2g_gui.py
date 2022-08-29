@@ -38,7 +38,7 @@ def updateConfigDict():
 
 
 def floats(s):
-  return list(map(float,str.split(s,',')))
+  return list(map(float,s.split(',')))
 
 
 def saveConfig():
