@@ -23,7 +23,7 @@ import optimize
 def main():
     # Parse arguments.
     cnf = config.getDefaultConfig()
-    floats = lambda s: map(float, s.split(','))
+    floats = lambda s: list(map(float, s.split(',')))
     formatList = lambda a: str(a).strip("[]").replace(" ", "")
 
     # Format default values.
@@ -69,10 +69,10 @@ def main():
         print("FATAL ERROR: Could not find 'pstoedit' in your PATH. Exiting.")
         sys.exit(1)
     if distutils.spawn.find_executable("gerbv") is None:
-        print("ERROR: Could not find 'gerbv' in your PATH. Exiting")
+        print("ERROR: Could not find 'gerbv' in your PATH. Exiting.")
         sys.exit(1)
     if distutils.spawn.find_executable("inkscape") is None and extension in allowed_inkscape_extensions:
-        print("ERROR: Could not find 'inkscape' in your PATH. Exiting")
+        print("ERROR: Could not find 'inkscape' in your PATH. Exiting.")
         sys.exit(1)
 
 
