@@ -264,6 +264,16 @@ def get_ghostscript_path():
     if ghostscript_filename:
         ghostscript_path.set(ghostscript_filename)
 
+
+def selectAll(event):
+    # Select text.
+    event.widget.select_range(0, 'end')
+    # Move cursor to the end.
+    event.widget.icursor('end')
+    # Stop event propagation.
+    return "break"
+
+
 def arrToStr(a):
     return str(a).strip("[]").replace(" ", "")
 
@@ -299,8 +309,11 @@ if __name__ == "__main__":
     def addInputRow(title, textVariable, buttonText, command):
         global row
         Label(top, text=title).grid(row=row, column=0, sticky=W)
-        Entry(top, bd=1, width=60, textvariable=textVariable).grid(row=row, column=1)
-        tkinter.Button(top, width=9, text=buttonText, command=command).grid(row=row, column=2)
+        entry = Entry(top, bd=1, width=60, textvariable=textVariable)
+        entry.bind('<Control-a>', selectAll)
+        entry.grid(row=row, column=1)
+        if buttonText != "":
+            tkinter.Button(top, width=9, text=buttonText, command=command).grid(row=row, column=2)
         row += 1
 
     addInputRow("Input File", Gerber_name, "Browse", get_input_filename)
@@ -319,9 +332,7 @@ if __name__ == "__main__":
     addInputRow("Cut Mode", cut_mode_str, "Default", lambda: getDefaultValue("cutMode", cut_mode_str))
 
     labelText = "Cutter Shared Name" if os.name == "nt" else "Cutter Device Name"
-    Label(top, text=labelText).grid(row=row, column=0, sticky=W)
-    Entry(top, bd =1, width=60, textvariable=cutter_shared_name_str).grid(row=row, column=1, sticky=E)
-    row += 1
+    addInputRow(labelText, cutter_shared_name_str, "", None)
 
     # Create main button area.
     def addButtonRow(text, command):
