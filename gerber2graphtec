@@ -17,13 +17,14 @@ import string
 #
 
 offset = (4,0.5)
-border = (1,1)
+border = (0,0)
 matrix = (1,0,0,1)
 speed = [2,2]
 force = [8,30]
 cut_mode = 0
 input_filename = ''
-media_size = (12,11)
+#media_size = (12,11)
+media_size = (11.7,8.3)
 theta = 0
 
 def floats(s):
@@ -110,6 +111,7 @@ g = graphtec.graphtec()
 
 g.set(media_size=media_size)
 g.set(offset=(offset[0]+border[0]+0.5,offset[1]+border[1]+0.5))
+
 g.set(matrix=matrix)
 
 g.start()
@@ -126,6 +128,7 @@ border_path = [
   (-border[0], max_y+border[1])
 ]
 
+
 if cut_mode==0:
   lines = optimize.optimize(strokes, border)
   for (s,f) in zip(speed,force):
@@ -133,7 +136,7 @@ if cut_mode==0:
     for x in lines:
       g.line(*x)
     if border[0]!=0 or border[1]!=0:
-      g.closed_path(border_path)
+     g.closed_path(border_path)
 else:
   for (s,f) in zip(speed,force):
     g.set(speed=s, force=f)
@@ -141,5 +144,6 @@ else:
       g.closed_path(s)
     if border[0]!=0 or border[1]!=0:
       g.closed_path(border_path)
+
 
 g.end()

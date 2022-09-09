@@ -11,7 +11,7 @@ class graphtec:
     self.scale = 2.54*200
     self.offset = (4.0,0.5)
     self.matrix = (1,0,0,1)
-    self.media_size = (12,11)   # default of 12x11 inches
+    self.media_size = (11.7,8.3)   # default of 12x11 inches
 
   def emit(self, s):
     self.fd.write(s)
@@ -23,32 +23,34 @@ class graphtec:
     page = ["media_size", int(self.scale*self.media_size[0]), int(self.scale*self.media_size[1])]
     margintop = 500                           # margins in device units
     marginright = 320
-    self.emit("\x1b\x04")  # initialize plotte
-    self.emit("\x1b\x05")  # status request
+    #self.emit("\x1b\x04")  # initialize plotte
+    #self.emit("\x1b\x05")  # status request
 #receive() "0\x03"
-    self.emit("TT\x03")    # home the cutter
-    self.emit("FG\x03")    # query version
+    #self.emit("TT\x03")    # home the cutter!!
+    #self.emit("FG\x03")    # query version!!
 #receive() "CAMEO V1.10    \x03"
-    self.emit("FW" + papertype + "\x03")
+    #self.emit("FW" + papertype + "\x03")  #!!
     self.emit("FC18\x03")
-    self.emit("FY" + trackenhancing + "\x03")
-    self.emit("FN" + orientation + "\x03")
-    self.emit("FE0\x03")
+    self.emit("FY" + trackenhancing + "\x03")   #!!--
+    self.emit("FN" + "0" + "\x03") #--------------------
+    #self.emit("FE0\x03")  #!!
     self.emit("TB71\x03")
 #receive() "    0,    0\x03"
-    self.emit("FA\x03")     # begin page definition
-    self.emit("FU" + str(page[2] - margintop) + "," + str(page[1] - marginright) + "\x03")
-    self.emit("FM1\x03")    # ??
-    self.emit("TB50,1\x03") # ??
+    #self.emit("FA\x03")     # begin page definition
+    self.emit("FU" + str(page[2] - margintop) + "," + str(page[1] - marginright) + "\x03") #калибровка
+    self.emit("FM0\x03")    # ??
+    self.emit("TB50,0\x03") # ??------------------------------------
     self.emit("FO" + str(page[2] - margintop) + "\x03")  # feed command?
     self.emit("&100,100,100,\\0,0,")                     # ??
     self.emit("Z" + str(page[1]) + "," + str(page[2]) + ",L0,")
 
   def end(self):
     self.emit("&1,1,1,TB50,0\x03")
-    self.emit("FO0\x03")    # feed the page out
-    self.emit("H,")         # halt?
-
+    #self.emit("FO0\x03")    # feed the page out 
+    #self.emit("H.")         # halt?
+    self.emit("L0.\\0,0.")
+    self.emit("M0,0.FN0")
+	
   def transform(self, x, y):
     tx = self.matrix[0]*x + self.matrix[1]*y + self.offset[0]
     ty = self.matrix[2]*x + self.matrix[3]*y + self.offset[1]

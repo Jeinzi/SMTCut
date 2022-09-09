@@ -3,6 +3,7 @@ import tkinter
 import sys
 import os
 import string
+import time
 
 from tkinter import *
 from tkinter import filedialog
@@ -38,7 +39,7 @@ cut_mode_text = ''
 cutter_shared_name_text = ''
 
 offset = (4,0.5)
-border = (1,1)
+border = (2,2)
 matrix = (1,0,0,1)
 speed = [2,2]
 force = [8,30]
@@ -141,13 +142,13 @@ def main_program():
       g.set(speed=s, force=f)
       for x in lines:
         g.line(*x)
-      g.closed_path(border_path)
+      #g.closed_path(border_path)
   else:
     for (s,f) in zip(speed,force):
       g.set(speed=s, force=f)
       for s in strokes:
         g.closed_path(s)
-      g.closed_path(border_path)
+     #g.closed_path(border_path)
 
   g.end()
 
@@ -192,7 +193,23 @@ def Send_to_Cutter():
     if os.name=='nt':
       os.system("copy /B \"%s\" \"%s\"" % (src, dst))
     else:
+      print(src)
+      print(dst)
+      print("1 cat %s > %s" % (src, dst))
       os.system("cat %s > %s" % (src, dst))
+"""
+      
+      time.sleep(5.1)
+      print("2 cat %s > %s" % (src, dst))
+      os.system("cat %s > %s" % (src, dst))
+      time.sleep(5.1)
+      print("3 cat %s > %s" % (src, dst))
+      os.system("cat %s > %s" % (src, dst))
+      time.sleep(5.1)
+      print("4 cat %s > %s" % (src, dst))
+      os.system("cat %s > %s" % (src, dst))
+"""
+
 
 def get_input_filename():
     input_filename=tkinter.filedialog.askopenfilename(title='Select paste mask Gerber file', filetypes=[('Gerber File', '*.g*'),("All files", "*.*")] )
@@ -218,7 +235,7 @@ def default_offset_str():
     offset_str.set("4.0,0.5")
     
 def default_border_str():
-    border_str.set("1,1")
+    border_str.set("2,2")
     
 def default_matrix_str():
     matrix_str.set("1,0,0,1")
@@ -327,7 +344,7 @@ if not pstoedit_filename:
 if not offset_text:
     offset_text="4.0,0.5"
 if not border_text:
-    border_text="1,1"
+    border_text="2,2"
 if not matrix_text:
     matrix_text="1,0,0,1"
 if not speed_text:
