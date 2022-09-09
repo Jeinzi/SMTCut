@@ -110,8 +110,7 @@ These pages have hints on usage (e.g. on Windows), materials, performance, calib
 ## Credits
 Thanks to the authors of robocut and graphtecprint for protocol documentation:
 
-- [robocut](http://gitorious.org/robocut)
-- [graphtecprint](http://vidar.botfu.org/graphtecprint)
+- [robocut](https://github.com/Timmmm/robocut)
 - [graphtecprint](https://github.com/jnweiger/graphtecprint)
 
 Also thanks to this web page (Cathy Sexton) for inspiration:
