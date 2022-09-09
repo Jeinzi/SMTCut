@@ -6,8 +6,16 @@
 # Copyright (c) 2013 Peter Monta <pmonta@gmail.com>
 # Copyright (c) 2022 Julian Heinzel <jeinzi@gmx.de>
 
+import os
 import sys
 import usb1
+
+progressAvailable = False
+try:
+  from tqdm import tqdm
+  progressAvailable = True
+except:
+  print("Progress bar not available, install tqdm if you'd like to change that.")
 
 #
 # open a graphtec vinyl cutter from a list of recognized devices
@@ -40,6 +48,7 @@ if len(sys.argv)==2:
   f = open(sys.argv[1], "rb")
 elif len(sys.argv)==1:
   f = sys.stdin
+  progressAvailable = False
 else:
   print("Usage: file2graphtec [filename]")
   sys.exit(1)
@@ -58,10 +67,16 @@ else:
 handle.claimInterface(0)
 print(f"Found device '{product_name}'.")
 
+# If possible, create a progress bar.
+if progressAvailable:
+  fileSize = os.path.getsize(sys.argv[1])
+  pBar = tqdm(total=fileSize, unit="Byte")
+
 while True:
-  data = f.read(8)
-  if not data:
+  if not (data := f.read(8)):
     break
   handle.bulkWrite(endpoint, data)
+  if progressAvailable:
+    pBar.update(8)
 
 f.close()

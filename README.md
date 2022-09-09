@@ -23,6 +23,8 @@ To be able to run this software, make sure that you have installed the following
 - [pstoedit](http://www.calvina.de/pstoedit)
 - [libusb](https://libusb.info)
 
+If you (optionally) install the python module [tqdm](https://github.com/tqdm/tqdm), file2graphtec.py will show a progress bar.
+
 #### Install on Mac OSX:
 Make sure you already have installed [Homebrew](https://brew.sh/) and simply run the following commands:
 
