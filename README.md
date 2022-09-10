@@ -23,7 +23,7 @@ To be able to run this software, make sure that you have installed the following
 - [pstoedit](http://www.calvina.de/pstoedit)
 - [libusb](https://libusb.info)
 
-If you (optionally) install the python module [tqdm](https://github.com/tqdm/tqdm), file2graphtec.py will show a progress bar.
+If you (optionally) install the python module [tqdm](https://github.com/tqdm/tqdm), send2cutter.py will show a progress bar.
 
 #### Install on Mac OSX:
 Make sure you already have installed [Homebrew](https://brew.sh/) and simply run the following commands:
@@ -40,7 +40,6 @@ pip3 install libusb1
 ```
 
 ## Usage
-
 In general there are two different cases to distinguish depending on your operating system. Please note that this process can take a few minutes before the cutter starts to cut!
 
 ### Linux
@@ -57,20 +56,20 @@ Or a more elaborate command line with linear map (to correct spatial miscalibrat
 ```
 
 ### Mac OSX and Windows
-With Mac OS X or Windows, the file2graphtec script can take the place of /dev/usb/lp0. But keep in mind that the software is tested on Mac OS X but not on Windows!
+With Mac OS X or Windows, the send2cutter script can take the place of /dev/usb/lp0. But keep in mind that the software is tested on Mac OS X but not on Windows!
 
 E.g. a solderpaste gerber file (paste.gbr), and default settings:
 
 ```
 python3 smtcut.py paste.gbr > tmpfile
-python3 file2graphtec.py tmpfile
+python3 send2cutter.py tmpfile
 ```
 
 Or a more elaborate command line with linear map (to correct spatial miscalibration) and multiple passes with different speeds and forces:
 
 ```
 python3 smtcut.py --offset 3,4 --matrix 1.001,0,-0.0005,0.9985 --speed 2,1 --force 5,25 paste.gbr > tmpfile
-python3 file2graphtec.py tmpfile
+python3 send2cutter.py tmpfile
 ```
 
 
@@ -79,7 +78,7 @@ To achieve the best results, one should run different calibrations, which can be
 
 ```
 python3 tests/test_forces.py > tmpfile
-python3 file2graphtec.py tmpfile
+python3 send2cutter.py tmpfile
 ```
 
 ## GUI

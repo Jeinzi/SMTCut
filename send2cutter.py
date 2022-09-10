@@ -54,7 +54,7 @@ if __name__ == "__main__":
     f = sys.stdin
     progressAvailable = False
   else:
-    print("Usage: file2graphtec [filename]")
+    print("Usage: send2cutter.py [filename]")
     sys.exit(1)
 
 
