@@ -10,13 +10,6 @@ import os
 import sys
 import usb1
 
-progressAvailable = False
-try:
-  from tqdm import tqdm
-  progressAvailable = True
-except:
-  print("Progress bar not available, install tqdm if you'd like to change that.")
-
 
 # List of recognized devices.
 device_list = [
@@ -31,6 +24,8 @@ device_list = [
 #  (0x0b4d, 0x110a, "Graphtec Craft ROBO"),    # Not working
 ]
 
+
+
 # Open the first recognized device.
 def open_graphtec_device(ctx):
   for (vendor_id,product_id,product_name) in device_list:
@@ -40,46 +35,59 @@ def open_graphtec_device(ctx):
   return None
 
 
-# Parse command line arguments.
-if len(sys.argv)==2:
-  f = open(sys.argv[1], "rb")
-elif len(sys.argv)==1:
-  f = sys.stdin
+
+if __name__ == "__main__":
+  # Try to import progress bar.
   progressAvailable = False
-else:
-  print("Usage: file2graphtec [filename]")
-  sys.exit(1)
+  try:
+    from tqdm import tqdm
+    progressAvailable = True
+  except:
+    print("Progress bar not available, install tqdm if you'd like to change that.")
+
+  # Parse command line arguments.
+  argc = len(sys.argv)
+  if argc == 2:
+    fileName = sys.argv[1]
+    f = open(fileName, "rb")
+  elif argc == 1:
+    f = sys.stdin
+    progressAvailable = False
+  else:
+    print("Usage: file2graphtec [filename]")
+    sys.exit(1)
 
 
-# Find and identify cutter
-ctx = usb1.USBContext()
-res = open_graphtec_device(ctx)
-if not res:
-  sys.stderr.write("No graphtec device found.\n")
-  sys.exit(1)
-else:
-  (handle, product_name) = res
+  # Find and identify cutter
+  ctx = usb1.USBContext()
+  res = open_graphtec_device(ctx)
+  if not res:
+    sys.stderr.write("No graphtec device found.\n")
+    sys.exit(1)
+  else:
+    (handle, product_name) = res
 
-# Claim device.
-print(f"Found device '{product_name}'.")
-try:
-  handle.detachKernelDriver(0)
-except:
-  pass
-handle.claimInterface(0)
+  # Claim device.
+  print(f"Found device '{product_name}'.")
+  try:
+    handle.detachKernelDriver(0)
+  except:
+    pass
+  handle.claimInterface(0)
 
-# If possible, create a progress bar.
-if progressAvailable:
-  fileSize = os.path.getsize(sys.argv[1])
-  pBar = tqdm(total=fileSize, unit="Byte")
-
-# Transfer data.
-endpoint = 1
-while True:
-  if not (data := f.read(8)):
-    break
-  handle.bulkWrite(endpoint, data)
+  # If possible, create a progress bar.
   if progressAvailable:
-    pBar.update(8)
+    fileSize = os.path.getsize(sys.argv[1])
+    pBar = tqdm(total=fileSize, unit="Byte")
 
-f.close()
+  # Transfer data.
+  endpoint = 1
+  while True:
+    if not (data := f.read(8)):
+      break
+    handle.bulkWrite(endpoint, data)
+    if progressAvailable:
+      pBar.update(8)
+
+  pBar.close()
+  f.close()
