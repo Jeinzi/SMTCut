@@ -28,6 +28,7 @@ device_list = [
   (0x0b4d, 0x113A, "Silhouette Portrait 3"),  # Not tested
   (0x0b4d, 0x112c, "Silhouette SD1"),         # Not tested
   (0x0b4d, 0x112d, "Silhouette SD2"),         # Not tested
+#  (0x0b4d, 0x110a, "Graphtec Craft ROBO"),    # Not working
 ]
 
 # Open the first recognized device.
