@@ -17,10 +17,8 @@ try:
 except:
   print("Progress bar not available, install tqdm if you'd like to change that.")
 
-#
-# open a graphtec vinyl cutter from a list of recognized devices
-#
 
+# List of recognized devices.
 device_list = [
   (0x0b4d, 0x1121, "Silhouette Cameo"),
   (0x0b4d, 0x112b, "Silhouette Cameo 2"),
@@ -40,10 +38,8 @@ def open_graphtec_device(ctx):
       return (handle, product_name)
   return None
 
-#
-# main program
-#
 
+# Parse command line arguments.
 if len(sys.argv)==2:
   f = open(sys.argv[1], "rb")
 elif len(sys.argv)==1:
@@ -53,25 +49,31 @@ else:
   print("Usage: file2graphtec [filename]")
   sys.exit(1)
 
-endpoint = 1
+
+# Find and identify cutter
 ctx = usb1.USBContext()
-
 res = open_graphtec_device(ctx)
-
 if not res:
   sys.stderr.write("No graphtec device found.\n")
   sys.exit(1)
 else:
   (handle, product_name) = res
 
-handle.claimInterface(0)
+# Claim device.
 print(f"Found device '{product_name}'.")
+try:
+  handle.detachKernelDriver(0)
+except:
+  pass
+handle.claimInterface(0)
 
 # If possible, create a progress bar.
 if progressAvailable:
   fileSize = os.path.getsize(sys.argv[1])
   pBar = tqdm(total=fileSize, unit="Byte")
 
+# Transfer data.
+endpoint = 1
 while True:
   if not (data := f.read(8)):
     break
