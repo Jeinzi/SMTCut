@@ -20,7 +20,7 @@ import optimize
 
 
 
-def main():
+if __name__ == "__main__":
     # Parse arguments.
     cnf = config.getDefaultConfig()
     floats = lambda s: list(map(float, s.split(',')))
@@ -132,9 +132,3 @@ def main():
         g.closed_path(border_path)
 
     g.end()
-
-
-
-
-if __name__ == "__main__":
-    main()
