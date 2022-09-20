@@ -40,6 +40,16 @@ def saveConfig():
   config.writeConfigFile(cnf)
 
 
+def getInputFile():
+  updateConfigDict()
+  if not os.path.exists(cnf["inputPath"]):
+    selectInputFile()
+  if not os.path.exists(cnf["inputPath"]):
+    tkinter.messagebox.showerror("SMTCut Error", "The path provided for the input Gerber file is invalid.")
+    return False
+  return True
+
+
 def createForceTestFile():
   updateConfigDict()
   original_stdout = sys.stdout  # keep a reference to STDOUT
@@ -69,14 +79,8 @@ def createForceTestFile():
 
 
 def showGerber():
-  updateConfigDict()
-  if not os.path.exists(cnf["inputPath"]):
-    selectInputFile()
-  if not os.path.exists(cnf["inputPath"]):
-    tkinter.messagebox.showerror("SMTCut Error", "The path provided for the input Gerber file is invalid.")
+  if not getInputFile():
     return
-
-  head, tail = os.path.split(cnf["inputPath"])
 
   if os.name == 'nt':
     if not os.path.exists(cnf["gerbvPath"]):
@@ -90,16 +94,10 @@ def showGerber():
 
 def convertInput():
   # Convert file to PIC format.
-  updateConfigDict()
-
-  if not os.path.exists(cnf["inputPath"]):
-    selectInputFile()
-  if not os.path.exists(cnf["inputPath"]):
-    tkinter.messagebox.showerror("SMTCut Error", "The path provided for the input Gerber file is invalid.")
+  if not getInputFile():
     return
 
   head, tail = os.path.split(cnf["inputPath"])
-
   if os.name=='nt':
     temp_pdf = os.path.normpath(f"{head}\_tmp_gerber.pdf")
     temp_ps  = os.path.normpath(f"{head}\_tmp_gerber.ps" )
@@ -213,29 +211,34 @@ def startCutting():
 
 
 def selectInputFile():
-    input_filename=tkinter.filedialog.askopenfilename(title='Select paste mask Gerber file', filetypes=[('Gerber File', ('*.g*', '*.G*')),("All files", "*.*")])
-    if input_filename:
-        Gerber_name.set(input_filename)
+    path=tkinter.filedialog.askopenfilename(title='Select paste mask Gerber file', filetypes=[('Gerber File', ('*.g*', '*.G*')),("All files", "*.*")])
+    if path:
+        Gerber_name.set(path)
+        cnf["inputPath"] = path
 
 def selectOutputFile():
-    output_filename=tkinter.filedialog.asksaveasfilename(title='Select output filename', filetypes=[('Output files', '*.txt'),("All files", "*.*")] )
-    if output_filename:
-        Output_name.set(output_filename)
+    path=tkinter.filedialog.asksaveasfilename(title='Select output filename', filetypes=[('Output files', '*.txt'),("All files", "*.*")] )
+    if path:
+        Output_name.set(path)
+        cnf["outputPath"] = path
 
 def selectGerbvExe():
-    gerbv_filename=tkinter.filedialog.askopenfilename(title='Select gerbv program', initialfile='gerbv.exe', filetypes=[('Programs', '*.exe')] )
-    if gerbv_filename:
-        gerbv_path.set(gerbv_filename)
+    path=tkinter.filedialog.askopenfilename(title='Select gerbv program', initialfile='gerbv.exe', filetypes=[('Programs', '*.exe')] )
+    if path:
+        gerbv_path.set(path)
+        cnf["gerbvPath"] = path
 
 def selectPstoeditExe():
-    pstoedit_filename=tkinter.filedialog.askopenfilename(title='Select gerbv program', initialfile='pstoedit.exe', filetypes=[('Programs', '*.exe')] )
-    if pstoedit_filename:
-        pstoedit_path.set(pstoedit_filename)
+    path=tkinter.filedialog.askopenfilename(title='Select pstoedit program', initialfile='pstoedit.exe', filetypes=[('Programs', '*.exe')] )
+    if path:
+        pstoedit_path.set(path)
+        cnf["pstoeditPath"] = path
 
 def selectGhostscriptExe():
-    ghostscript_filename=tkinter.filedialog.askopenfilename(title='Select Ghostscript program', initialfile='ghostscript.exe', filetypes=[('Programs', '*.exe')] )
-    if ghostscript_filename:
-        ghostscript_path.set(ghostscript_filename)
+    path=tkinter.filedialog.askopenfilename(title='Select Ghostscript program', initialfile='ghostscript.exe', filetypes=[('Programs', '*.exe')] )
+    if path:
+        ghostscript_path.set(path)
+        cnf["ghostscriptPath"] = path
 
 
 def selectAll(event):
