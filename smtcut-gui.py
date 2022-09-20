@@ -40,7 +40,7 @@ def saveConfig():
   config.writeConfigFile(cnf)
 
 
-def test_forces():
+def createForceTestFile():
   updateConfigDict()
   original_stdout = sys.stdout  # keep a reference to STDOUT
 
@@ -68,10 +68,10 @@ def test_forces():
 
 
 
-def show_gerber():
+def showGerber():
   updateConfigDict()
   if not os.path.exists(cnf["inputPath"]):
-    get_input_filename()
+    selectInputFile()
   if not os.path.exists(cnf["inputPath"]):
     tkinter.messagebox.showerror("SMTCut Error", "The path provided for the input Gerber file is invalid.")
     return
@@ -88,12 +88,12 @@ def show_gerber():
 
 
 
-def main_program():
+def convertInput():
   # Convert file to PIC format.
   updateConfigDict()
 
   if not os.path.exists(cnf["inputPath"]):
-    get_input_filename()
+    selectInputFile()
   if not os.path.exists(cnf["inputPath"]):
     tkinter.messagebox.showerror("SMTCut Error", "The path provided for the input Gerber file is invalid.")
     return
@@ -180,14 +180,14 @@ def main_program():
     tkinter.messagebox.showinfo("SMTCut Message", f"File '{Output_name.get()}' created")
 
 
-def Just_Exit():
+def exitGui():
     top.destroy()
 
 
-def Send_to_Cutter():
+def startCutting():
     updateConfigDict()
     if not cnf["outputPath"]:
-      get_output_filename()
+      selectOutputFile()
     if not cnf["outputPath"]:
       return
     src=os.path.normpath(cnf["outputPath"])
@@ -212,27 +212,27 @@ def Send_to_Cutter():
       return
 
 
-def get_input_filename():
+def selectInputFile():
     input_filename=tkinter.filedialog.askopenfilename(title='Select paste mask Gerber file', filetypes=[('Gerber File', ('*.g*', '*.G*')),("All files", "*.*")])
     if input_filename:
         Gerber_name.set(input_filename)
 
-def get_output_filename():
+def selectOutputFile():
     output_filename=tkinter.filedialog.asksaveasfilename(title='Select output filename', filetypes=[('Output files', '*.txt'),("All files", "*.*")] )
     if output_filename:
         Output_name.set(output_filename)
 
-def get_gerbv_path():
+def selectGerbvExe():
     gerbv_filename=tkinter.filedialog.askopenfilename(title='Select gerbv program', initialfile='gerbv.exe', filetypes=[('Programs', '*.exe')] )
     if gerbv_filename:
         gerbv_path.set(gerbv_filename)
 
-def get_pstoedit_path():
+def selectPstoeditExe():
     pstoedit_filename=tkinter.filedialog.askopenfilename(title='Select gerbv program', initialfile='pstoedit.exe', filetypes=[('Programs', '*.exe')] )
     if pstoedit_filename:
         pstoedit_path.set(pstoedit_filename)
 
-def get_ghostscript_path():
+def selectGhostscriptExe():
     ghostscript_filename=tkinter.filedialog.askopenfilename(title='Select Ghostscript program', initialfile='ghostscript.exe', filetypes=[('Programs', '*.exe')] )
     if ghostscript_filename:
         ghostscript_path.set(ghostscript_filename)
@@ -289,13 +289,13 @@ if __name__ == "__main__":
             tkinter.Button(top, width=9, text=buttonText, command=command).grid(row=row, column=2)
         row += 1
 
-    addInputRow("Input File", Gerber_name, "Browse", get_input_filename)
-    addInputRow("Output File", Output_name, "Browse", get_output_filename)
+    addInputRow("Input File", Gerber_name, "Browse", selectInputFile)
+    addInputRow("Output File", Output_name, "Browse", selectOutputFile)
 
     if os.name == "nt":
-        addInputRow("gerbv path", gerbv_path, "Browse", get_gerbv_path)
-        addInputRow("Ghostscript path", ghostscript_path, "Browse", get_ghostscript_path)
-        addInputRow("pstoedit path", pstoedit_path, "Browse", get_pstoedit_path)
+        addInputRow("gerbv path", gerbv_path, "Browse", selectGerbvExe)
+        addInputRow("Ghostscript path", ghostscript_path, "Browse", selectGhostscriptExe)
+        addInputRow("pstoedit path", pstoedit_path, "Browse", selectPstoeditExe)
 
     addInputRow("Offset", offset_str, "Default", lambda: getDefaultValue("offset", offset_str))
     addInputRow("Border", border_str, "Default", lambda: getDefaultValue("border", border_str))
@@ -312,11 +312,11 @@ if __name__ == "__main__":
         global row
         tkinter.Button(top, width=40, text=text, command=command).grid(row=row, column=1)
         row += 1
-    addButtonRow("Show Gerber", show_gerber)
-    addButtonRow("Create Graphtec File from input", main_program)
-    addButtonRow("Send Graphtec File to Silhouette Cutter", Send_to_Cutter)
+    addButtonRow("Show Gerber", showGerber)
+    addButtonRow("Create Graphtec File from input", convertInput)
+    addButtonRow("Send Graphtec File to Silhouette Cutter", startCutting)
     addButtonRow("Save Configuration", saveConfig)
-    addButtonRow("Create force testing Graphtec file", test_forces)
-    addButtonRow("Exit", Just_Exit)
+    addButtonRow("Create force testing Graphtec file", createForceTestFile)
+    addButtonRow("Exit", exitGui)
 
     top.mainloop()
