@@ -14,6 +14,7 @@ import graphtec
 import pic
 import optimize
 import config
+import smtcut
 
 
 def updateConfigDict():
@@ -135,46 +136,15 @@ def convertInput():
     os.system(f"'{ghostscript}' -dNOPAUSE -dBATCH -sDEVICE=ps2write -sOutputFile='{temp_ps}' '{temp_pdf}'")
     os.system(f"'{pstoedit}' -q -f pic '{temp_ps}' '{temp_pic}'")
 
-  original_stdout = sys.stdout  # keep a reference to STDOUT
 
+  original_stdout = sys.stdout  # Keep a reference to stdout.
   if cnf["outputPath"]:
     sys.stdout = open(cnf["outputPath"], 'w')
 
-
-  # Main program.
-  g = graphtec.graphtec()
-  g.start()
-
-  border = cnf["border"]
-  g.set(offset=(cnf["offset"][0]+border[0]+0.5,cnf["offset"][1]+border[1]+0.5), matrix=cnf["matrix"])
-  strokes = pic.read_pic(temp_pic)
-  max_x,max_y = optimize.max_extent(strokes)
-
-  border_path = [
-    (-border[0], -border[1]),
-    (max_x+border[0], -border[1]),
-    (max_x+border[0], max_y+border[1]),
-    (-border[0], max_y+border[1])
-  ]
-
-  if cnf["cutMode"] == 0:
-    lines = optimize.optimize(strokes, border)
-    for (s,f) in zip(cnf["speed"], cnf["force"]):
-      g.set(speed=s, force=f)
-      for x in lines:
-        g.line(*x)
-      g.closed_path(border_path)
-  else:
-    for (s,f) in zip(cnf["speed"], cnf["force"]):
-      g.set(speed=s, force=f)
-      for s in strokes:
-        g.closed_path(s)
-      g.closed_path(border_path)
-
-  g.end()
+  smtcut.emitGpgl(temp_pic, cnf)
 
   if Output_name.get():
-    sys.stdout = original_stdout  # restore STDOUT back to its original value
+    sys.stdout = original_stdout  # Restore stdout back to its original value.
     tkinter.messagebox.showinfo("SMTCut Message", f"File '{Output_name.get()}' created")
 
 

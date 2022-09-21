@@ -30,6 +30,7 @@ defaultConfig = {
     "offset": [0.5,0.5],
     "border": [1,1],
     "matrix": [1,0,0,1],
+    "theta": 0,
     "speed": [2,2],
     "force": [8,30],
     "mergeThreshold": [0.012, 0.01],

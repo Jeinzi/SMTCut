@@ -20,6 +20,57 @@ import optimize
 
 
 
+
+# This funcionality is extracted into a function in order to reuse
+# it in the GUI.
+def emitGpgl(picFile, cnf):
+    offset, border = cnf["offset"], cnf["border"]
+    xOff = offset[0] + border[0] + 0.5
+    yOff = offset[1] + border[1] + 0.5
+
+    g = graphtec.graphtec()
+    g.set(media_size=cnf["mediaSize"])
+    g.set(offset=(xOff, yOff))
+    g.set(matrix=cnf["matrix"])
+    g.start()
+
+    strokes = pic.read_pic(picFile)
+
+    # Optionally merge multiple smaller pads into bigger pads spanning the same area.
+    if not cnf["merge"] == 0:
+      import mergepads
+      strokes = mergepads.fix_small_geometry(strokes, cnf["mergeThreshold"][0], cnf["mergeThreshold"][1])
+
+    strokes = optimize.rotate(strokes, cnf["theta"])
+    strokes = optimize.justify(strokes)
+    maxX, maxY = optimize.max_extent(strokes)
+
+    border_path = [
+      (-border[0],      -border[1]),
+      (maxX+border[0], -border[1]),
+      (maxX+border[0], maxY+border[1]),
+      (-border[0],      maxY+border[1])
+    ]
+
+    if cnf["cutMode"] == 0:
+      lines = optimize.optimize(strokes, border)
+
+    for (s,f) in zip(cnf["speed"], cnf["force"]):
+      g.set(speed=s, force=f)
+      if cnf["cutMode"] == 0:
+        for x in lines:
+          g.line(*x)
+      else:
+        for s in strokes:
+          g.closed_path(s)
+      if border != [0, 0]:
+        g.closed_path(border_path)
+
+    g.end()
+
+
+
+
 if __name__ == "__main__":
     # Parse arguments.
     cnf = config.getDefaultConfig()
@@ -48,7 +99,7 @@ if __name__ == "__main__":
         help=f'0 for highest accuracy (fine pitch), 1 for highest speed (default: {cnf["cutMode"]})')
     parser.add_argument('--media_size', type=floats, default=cnf["mediaSize"],
         help=f'size of media (default: {dMediaSize} inches)')
-    parser.add_argument('--rotate', type=float, dest='theta', default=0.,
+    parser.add_argument('--rotate', type=float, dest='theta', default=cnf["theta"],
         help=f'rotate counterclockwise by theta degrees (default: no rotation)')
     parser.add_argument('--merge', type=int, choices=[0,1], default=cnf["merge"],
         help=f'merge close smaller structures into one big cutout (default: {cnf["merge"]})')
@@ -92,43 +143,15 @@ if __name__ == "__main__":
     os.system(f"gs -dNOPAUSE -dBATCH -sDEVICE=ps2write -sOutputFile='{temp_ps}' '{pdf_filename}'")
     os.system(f"pstoedit -f pic '{temp_ps}' '{temp_pic}' 2>/dev/null")
 
-
+    # Store CLI arguments in config object.
+    cnf["offset"] = args.offset
+    cnf["border"] = args.border
+    cnf["matrix"] = args.matrix
+    cnf["speed"] = args.speed
+    cnf["force"] = args.force
+    cnf["cutMode"] = args.cut_mode
+    cnf["mediaSize"] = args.media_size
+    cnf["theta"] = args.theta
+    cnf["merge"] = args.merge
     # Convert to Graphtec.
-    g = graphtec.graphtec()
-    g.set(media_size=args.media_size)
-    offset, border = args.offset, args.border
-    g.set(offset=(offset[0]+border[0]+0.5,offset[1]+border[1]+0.5))
-    g.set(matrix=args.matrix)
-    g.start()
-
-    strokes = pic.read_pic(temp_pic)
-
-    # Optionally merge multiple smaller pads into bigger pads spanning the same area.
-    if not args.merge == 0:
-      import mergepads
-      strokes = mergepads.fix_small_geometry(strokes, cnf["mergeThreshold"][0], cnf["mergeThreshold"][1])
-
-    strokes = optimize.rotate(strokes, args.theta)
-    strokes = optimize.justify(strokes)
-    max_x,max_y = optimize.max_extent(strokes)
-
-    border_path = [
-      (-border[0], -border[1]),
-      (max_x+border[0], -border[1]),
-      (max_x+border[0], max_y+border[1]),
-      (-border[0], max_y+border[1])
-    ]
-
-    for (s,f) in zip(args.speed, args.force):
-      g.set(speed=s, force=f)
-      if args.cut_mode==0:
-        lines = optimize.optimize(strokes, border)
-        for x in lines:
-          g.line(*x)
-      else:
-        for s in strokes:
-          g.closed_path(s)
-      if border != [0, 0]:
-        g.closed_path(border_path)
-
-    g.end()
+    emitGpgl(temp_pic, cnf)
